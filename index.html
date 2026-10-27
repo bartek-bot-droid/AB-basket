@@ -1,0 +1,1216 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e131b">
+<title>Princeton Offense Trener</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-column app; parkiet z diagramem u góry, panel pytania pod kciukiem. */
+:root {
+  --bg: #eceff3;
+  --surface: #ffffff;
+  --ink: #13203a;
+  --muted: #5a6579;
+  --line: #d3d9e2;
+  --court: #e6c48c;
+  --paint: #d8ad6c;
+  --court-line: #fffaf0;
+  --accent: #1d5bd3;
+  --accent-ink: #ffffff;
+  --ball: #e5671a;
+  --good: #17955a;
+  --bad: #d23838;
+  --chip: #ffffff;
+  --chip-ink: #13203a;
+  --shadow: 0 1px 2px rgba(19,32,58,.08), 0 6px 18px rgba(19,32,58,.08);
+  --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e131b; --surface: #171f2b; --ink: #e9eef6; --muted: #98a4b7; --line: #2a3443;
+    --court: #5c4429; --paint: #4c3720; --court-line: #f1e4cb;
+    --accent: #5c96ff; --accent-ink: #0b1220; --ball: #ff8a3d; --good: #37cc84; --bad: #ff6a6a;
+    --chip: #f4eee3; --chip-ink: #13203a; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e131b; --surface: #171f2b; --ink: #e9eef6; --muted: #98a4b7; --line: #2a3443;
+  --court: #5c4429; --paint: #4c3720; --court-line: #f1e4cb;
+  --accent: #5c96ff; --accent-ink: #0b1220; --ball: #ff8a3d; --good: #37cc84; --bad: #ff6a6a;
+  --chip: #f4eee3; --chip-ink: #13203a; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.45;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap {
+  max-width: 580px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- Home ---------- */
+#home { padding-block: 20px 40px; }
+.hero { display: grid; gap: 6px; padding-block: 8px 18px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.hero h1 {
+  font-family: var(--f-display); font-weight: 900; font-size: clamp(44px, 13vw, 72px); line-height: .88;
+  letter-spacing: -.01em; margin: 0; text-transform: uppercase; text-wrap: balance;
+}
+.hero h1 span { color: var(--ball); }
+.hero p { margin: 4px 0 0; color: var(--muted); max-width: 46ch; }
+.tally { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 14px; color: var(--muted); }
+.tally b { font-family: var(--f-display); font-size: 22px; color: var(--ink); font-variant-numeric: tabular-nums; margin-right: 4px; }
+
+.quick {
+  display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center;
+  background: var(--ink); color: var(--bg); border-radius: 16px; padding: 16px 18px; margin-block: 6px 26px;
+  border: 0; text-align: left; width: 100%; box-shadow: var(--shadow);
+}
+.quick strong { font-family: var(--f-display); font-size: 26px; font-weight: 800; text-transform: uppercase; line-height: 1; }
+.quick small { grid-column: 1; color: color-mix(in srgb, var(--bg) 72%, transparent); font-size: 14px; }
+.quick .go { grid-row: 1 / span 2; grid-column: 2; width: 46px; height: 46px; border-radius: 50%; background: var(--ball); display: grid; place-items: center; }
+.quick .go svg { width: 20px; height: 20px; fill: #fff; }
+
+.series { margin-block: 0 26px; }
+.series-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.series-head h2 { font-family: var(--f-display); font-weight: 800; font-size: 30px; text-transform: uppercase; margin: 0; line-height: 1; }
+.series-head .tag { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.series > p { margin: 0 0 10px; color: var(--muted); font-size: 14px; max-width: 60ch; }
+.drill {
+  display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center;
+  padding: 12px 0; border-top: 1px solid var(--line);
+}
+.drill:last-child { border-bottom: 1px solid var(--line); }
+.drill-name { font-weight: 600; min-width: 0; }
+.drill-name small { display: block; color: var(--muted); font-weight: 400; font-size: 13px; }
+.stars { display: inline-flex; gap: 3px; vertical-align: 2px; margin-left: 6px; }
+.stars i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--muted); display: block; }
+.stars i.on { background: var(--ball); border-color: var(--ball); }
+.drill-btns { display: flex; gap: 6px; }
+.btn {
+  border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px;
+  font-weight: 600; font-size: 14px; white-space: nowrap;
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.rules { margin-top: 10px; }
+.rules summary { cursor: pointer; font-family: var(--f-display); font-weight: 800; font-size: 24px; text-transform: uppercase; padding-block: 6px; }
+.rules ol { margin: 6px 0 0; padding-left: 22px; display: grid; gap: 8px; }
+.rules li { padding-left: 4px; }
+.rules li b { font-weight: 700; }
+.foot { margin-top: 28px; font-size: 13px; color: var(--muted); }
+
+/* ---------- Profil i ranking ---------- */
+.me { background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px; padding: 14px 16px; margin-block: 0 14px; display: grid; gap: 10px; }
+.me-row { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.me-row img { width: 40px; height: 40px; border-radius: 50%; flex: none; }
+.me-name { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.me-name small { display: block; font-weight: 500; color: var(--muted); font-size: 13px; }
+.me-stats { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.me-stats b { display: block; font-family: var(--f-display); font-size: 24px; line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.me p { margin: 0; font-size: 14px; color: var(--muted); }
+.me p b { color: var(--ink); }
+.nick { display: flex; gap: 8px; }
+.nick input { flex: 1; min-width: 0; font: inherit; padding: 9px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); }
+.nick input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.linkish { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; font-size: 13px; }
+.board { margin-block: 0 26px; }
+.tabs { display: inline-flex; background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; margin-block: 2px 8px; }
+.tabs button { border: 0; background: none; border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 14px; color: var(--muted); }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.rank { list-style: none; margin: 0; padding: 0; }
+.rank li { display: grid; grid-template-columns: 30px 32px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); }
+.rank li:last-child { border-bottom: 1px solid var(--line); }
+.rank li.mine { background: color-mix(in srgb, var(--accent) 10%, transparent); border-radius: 10px; }
+.rank .pos { font-family: var(--f-display); font-weight: 900; font-size: 22px; text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rank li:nth-child(1) .pos { color: var(--ball); }
+.rank img { width: 32px; height: 32px; border-radius: 50%; }
+.rank .who { min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank .who small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; }
+.rank .val { font-family: var(--f-display); font-weight: 800; font-size: 22px; text-align: right; font-variant-numeric: tabular-nums; padding-right: 6px; }
+.rank .val small { display: block; font-family: var(--f-body); font-weight: 500; font-size: 11px; color: var(--muted); }
+.empty { color: var(--muted); font-size: 14px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+/* ---------- Game ---------- */
+#game, #trig { height: 100%; display: flex; flex-direction: column; }
+.bar {
+  display: flex; align-items: center; gap: 10px; padding-block: 10px 8px;
+}
+.icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--surface); display: grid; place-items: center; flex: none; }
+.icon-btn svg { width: 18px; height: 18px; stroke: var(--ink); fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.bar-title { flex: 1; min-width: 0; }
+.bar-title .s { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.bar-title .n { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+.score { text-align: right; flex: none; }
+.score b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 26px; line-height: .9; font-variant-numeric: tabular-nums; }
+.score small { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.score small.hot { color: var(--ball); }
+.progress { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+.progress i { display: block; height: 100%; width: 0; background: var(--ball); transition: width .35s ease; }
+
+.court-box { position: relative; }
+#court { width: 100%; height: auto; display: block; border-radius: 12px; touch-action: none; user-select: none; -webkit-user-select: none; box-shadow: var(--shadow); max-height: 52vh; }
+.court-floor { fill: var(--court); }
+.court-paint { fill: var(--paint); }
+.cl { stroke: var(--court-line); stroke-width: .55; fill: none; }
+.rim { stroke: var(--ball); stroke-width: .6; fill: none; }
+.pl circle.body { fill: var(--chip); stroke: var(--chip-ink); stroke-width: .5; }
+.pl text { font-family: var(--f-display); font-weight: 800; font-size: 4.6px; fill: var(--chip-ink); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.pl .ring { fill: none; stroke: var(--accent); stroke-width: .8; opacity: 0; }
+.pl.active .ring { opacity: 1; animation: pulse 1.1s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.pl.active circle.body { fill: var(--accent); stroke: var(--accent); }
+.pl.active text { fill: var(--accent-ink); }
+.pl.pick circle.body { stroke: var(--accent); stroke-width: .8; }
+.pl.good circle.body { fill: var(--good); stroke: var(--good); }
+.pl.bad circle.body { fill: var(--bad); stroke: var(--bad); }
+.pl.good text, .pl.bad text { fill: #fff; }
+@keyframes pulse { 0%,100% { transform: scale(1); opacity: .9 } 50% { transform: scale(1.35); opacity: .2 } }
+#ball circle { fill: var(--ball); stroke: #7a2e05; stroke-width: .25; }
+#ball path { stroke: #7a2e05; stroke-width: .2; fill: none; }
+.tr { fill: none; stroke-linecap: round; stroke-linejoin: round; animation: draw .3s ease-out; }
+.tr.cut, .tr.move, .tr.dribble { stroke: var(--accent); stroke-width: .7; }
+.tr.move { opacity: .55; }
+.tr.dribble { stroke-dasharray: .1 1.4; stroke-width: .9; }
+.tr.screen { stroke: var(--ink); stroke-width: .75; }
+.tr.pass { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1.6 1.2; }
+.tr.bar { stroke: var(--ink); stroke-width: .9; }
+.old { opacity: .22; transition: opacity .3s; }
+@keyframes draw { from { opacity: 0 } to { opacity: 1 } }
+.def line { stroke: var(--bad); stroke-width: .8; stroke-linecap: round; }
+.ghost { fill: none; stroke: var(--chip-ink); stroke-width: .35; stroke-dasharray: .8 .8; opacity: .6; }
+.target { fill: color-mix(in srgb, var(--good) 22%, transparent); stroke: var(--good); stroke-width: .6; stroke-dasharray: 1.2 .9; }
+.drop-good { fill: none; stroke: var(--good); stroke-width: .7; }
+.drop-bad { stroke: var(--bad); stroke-width: .8; stroke-linecap: round; }
+.fx { font-family: var(--f-display); font-weight: 900; font-size: 7px; fill: var(--ball); text-anchor: middle; animation: pop 1.1s ease-out forwards; }
+@keyframes pop { 0% { opacity: 0; transform: translateY(2px) } 20% { opacity: 1 } 100% { opacity: 0; transform: translateY(-6px) } }
+
+.panel { flex: 1; display: flex; flex-direction: column; gap: 10px; padding-block: 14px max(16px, env(safe-area-inset-bottom, 0px)); min-height: 0; overflow-y: auto; }
+.kick { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.kick .h { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.deftag { font-size: 12px; font-weight: 700; color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, transparent); border-radius: 999px; padding: 2px 9px; }
+.prompt { font-family: var(--f-display); font-weight: 800; font-size: clamp(24px, 6.6vw, 30px); line-height: 1.02; text-transform: uppercase; margin: 0; text-wrap: balance; }
+.hint { font-size: 14px; color: var(--muted); margin: 0; }
+.choices { display: grid; gap: 8px; }
+.choice {
+  text-align: left; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface);
+  font-weight: 600; box-shadow: 0 1px 0 var(--line);
+}
+.choice.good { border-color: var(--good); background: color-mix(in srgb, var(--good) 14%, var(--surface)); }
+.choice.bad { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--surface)); }
+.choice:disabled { cursor: default; }
+.fb { border-radius: 12px; padding: 12px 14px; background: var(--surface); border: 1.5px solid var(--line); }
+.fb.good { border-color: var(--good); }
+.fb.bad { border-color: var(--bad); }
+.fb-head { font-family: var(--f-display); font-weight: 800; font-size: 20px; text-transform: uppercase; line-height: 1; margin-bottom: 4px; }
+.fb.good .fb-head { color: var(--good); }
+.fb.bad .fb-head { color: var(--bad); }
+.fb p { margin: 0; }
+.next {
+  margin-top: auto; border: 0; border-radius: 14px; padding: 15px; background: var(--ink); color: var(--bg);
+  font-family: var(--f-display); font-weight: 800; font-size: 22px; text-transform: uppercase; letter-spacing: .02em;
+}
+.next:disabled { opacity: .35; cursor: default; }
+.watch-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+.watch-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+/* ---------- Summary ---------- */
+.overlay { position: fixed; inset: 0; background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: grid; place-items: center; z-index: 20; padding: 16px; }
+.sheet { background: var(--surface); border-radius: 20px; box-shadow: var(--shadow); padding: 24px 20px 18px; width: min(420px, 100%); display: grid; gap: 12px; text-align: center; }
+.sheet h3 { font-family: var(--f-display); font-weight: 900; font-size: 38px; text-transform: uppercase; margin: 0; line-height: .95; }
+.big-stars { display: flex; justify-content: center; gap: 10px; }
+.big-stars i { width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--line); }
+.big-stars i.on { background: var(--ball); border-color: var(--ball); animation: starin .4s ease-out both; }
+.big-stars i.on:nth-child(2) { animation-delay: .12s } .big-stars i.on:nth-child(3) { animation-delay: .24s }
+@keyframes starin { from { transform: scale(.2); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+.sheet .stat { display: flex; justify-content: center; gap: 22px; color: var(--muted); font-size: 14px; }
+.sheet .stat b { display: block; font-family: var(--f-display); font-size: 30px; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1; }
+.sheet .btns { display: grid; gap: 8px; margin-top: 4px; }
+.sheet .btns .btn { padding: 12px; font-size: 16px; }
+
+/* ---------- Triggers ---------- */
+.trig-card { background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); padding: 18px; display: grid; gap: 6px; margin-block: 6px 12px; }
+.trig-card .if { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.trig-card .q { font-family: var(--f-display); font-weight: 800; font-size: clamp(28px, 8vw, 36px); line-height: 1; text-transform: uppercase; text-wrap: balance; }
+.timer { height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; }
+.timer i { display: block; height: 100%; background: var(--ball); width: 100%; transform-origin: left; }
+.then { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 4px 0 -2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pl.active .ring { animation: none; }
+  .tr, .fx, .big-stars i.on { animation: none; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+.av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  font-family: var(--f-display); font-weight: 800; font-size: 20px; color: #fff; background: hsl(var(--h, 210) 55% 42%); }
+.rank .av { width: 32px; height: 32px; font-size: 16px; }
+.auth { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.auth input { min-width: 0; font: inherit; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); }
+.auth input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.auth button { grid-column: 1 / -1; padding: 11px; font-size: 16px; }
+.me .tabs { justify-self: start; margin: 0; }
+.err { color: var(--bad) !important; font-weight: 600; min-height: 0; }
+.err:empty { display: none; }
+.rank li.empty { display: block; }
+</style>
+</head>
+<body>
+<div id="home" class="wrap"></div>
+<div id="game" class="wrap" hidden></div>
+<div id="trig" class="wrap" hidden></div>
+<div id="overlay" class="overlay" hidden></div>
+
+<script src="config.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ================= Boisko: współrzędne (kosz u góry, jak w rozpisce) ================= */
+const S = {
+  RIM: [50, 12], LC: [4, 6], RC: [96, 6], LW: [10, 34], RW: [90, 34],
+  LS: [30, 57], RS: [70, 57], TOP: [50, 62], HP: [50, 38], RB: [64, 15], LB: [36, 15],
+  RSC: [82, 12], LSC: [18, 12]
+};
+const BASKET = [50, 7];
+const pt = v => Array.isArray(v) ? v.slice() : S[v].slice();
+const INIT = { pos: { 1: 'RS', 2: 'LW', 3: 'RW', 4: 'LS', 5: 'RB' }, ball: 1 };
+const BENCH = { pos: { 1: [18, 72], 2: [34, 72], 3: [50, 72], 4: [66, 72], 5: [82, 72] }, ball: null };
+
+/* akcje */
+const mv = (p, to, via) => ({ k: 'move', p, to, via });
+const cut = (p, to, via) => ({ k: 'cut', p, to, via });
+const drb = (p, to, via) => ({ k: 'dribble', p, to, via });
+const scr = (p, to, via) => ({ k: 'screen', p, to, via });
+const pas = (from, to) => ({ k: 'pass', from, to });
+const dho = (from, to) => ({ k: 'dho', from, to });
+const shot = from => ({ k: 'shot', from });
+const ball = p => ({ k: 'ball', p });
+/* pytania */
+const Qmove = (p, to, text, tol) => ({ type: 'move', p, to, text, tol });
+const Qpass = (ans, text) => ({ type: 'pass', ans, text });
+const Qwho = (ans, text) => ({ type: 'who', ans, text });
+const Qch = (text, opts) => ({ type: 'choice', text, opts }); // opts[0] = poprawna
+
+/* ================= Zagrywki z rozpiski ================= */
+const SETUP = [
+  { h: 'Ustawienie 2-2-1', q: Qmove(1, 'RS', 'Gdzie stoi 1?'), t: '1: prawy slot (top, przy trójce). Rozpoczyna atak, podaje na skrzydło albo slot to slot.' },
+  { h: 'Ustawienie 2-2-1', q: Qmove(4, 'LS', 'Gdzie stoi 4?'), t: '4: lewy slot. Drugi rozgrywający, w serii Point wybiera cut (Away albo Over).' },
+  { h: 'Ustawienie 2-2-1', q: Qmove(2, 'LW', 'Gdzie stoi 2?'), t: '2: lewe skrzydło. Rzut, back cut, screeny.' },
+  { h: 'Ustawienie 2-2-1', q: Qmove(3, 'RW', 'Gdzie stoi 3?'), t: '3: prawe skrzydło. Rzut, back cut, screeny.' },
+  { h: 'Ustawienie 2-2-1', q: Qmove(5, 'RB', 'Gdzie stoi 5?', 10), a: [[mv(5, 'RB')], [ball(1)]], t: '5: low post po ball side (prawy block). Przede wszystkim podaje, wychodzi na high post i stawia screeny.' }
+];
+
+const LP_E = [
+  { h: 'Krok 1 · Wejście', q: Qpass(3, 'Start serii Low Post. Do kogo podaje 1?'), a: [pas(1, 3)], t: '1 podaje do 3 na skrzydło. To otwiera serię Low Post.' },
+  { h: 'Krok 1 · Wejście', q: Qmove(1, 'LC', '1 podał i nie stoi. Gdzie robi cut?'), a: [cut(1, 'LC', [44, 20])], t: '1 robi cut do corner na weak side, przez środek pod koszem.' },
+  { h: 'Krok 1 · Wejście', q: Qmove(4, 'TOP', 'Gdzie przesuwa się 4?'), a: [mv(4, 'TOP'), mv(2, [14, 45])], t: '4 przesuwa się na środek, 2 schodzi trochę niżej. Każdy trzyma swoje miejsce.' },
+  { h: 'Krok 1 · Wejście', q: Qpass(5, '5 ma przewagę na low post. Gdzie podaje 3?'), a: [pas(3, 5)], t: '3 podaje do 5 na low post, jeśli 5 ma przewagę. Gdy przewagi nie ma, gramy krok 3.' }
+];
+const LP_SCREEN = { h: 'Krok 2 · Piłka u 5', q: Qwho(3, 'Piłka u 5. Kto stawia screen dla 4?'), a: [scr(3, [63, 47])], t: '3 stawia screen dla 4 na elbow po ball side. Obaj zwalniają i najpierw patrzą na obrońców.' };
+const LP_BD = [
+  LP_SCREEN,
+  { h: 'Krok 2 · Backdoor', def: { p: 4, kind: 'tight', label: 'Obrońca 4: over the screen' }, q: Qmove(4, 'RIM', 'Obrońca 4 idzie over the screen. Gdzie biegnie 4?'), a: [cut(4, 'RIM', [56, 32])], t: 'Backdoor: 4 ścina do kosza za plecami obrońcy.' },
+  { h: 'Krok 2 · Backdoor', q: Qch('4 poszedł do kosza. Co robi 3?', ['Opposite cut: wychodzi na obwód', 'Też biegnie do kosza', 'Zostaje na screenie']), a: [mv(3, [86, 44])], t: 'Dwaj zawodnicy przy screenie robią przeciwne ruchy. Jeden idzie do kosza, drugi robi pop.' },
+  { h: 'Krok 2 · Backdoor', q: Qwho(5, '4 jest pod koszem. Kto mu podaje?'), a: [[pas(5, 4)], [shot(4)]], t: 'Podanie od 5 i lay-up tuż przed obręczą.' }
+];
+const LP_POP = [
+  LP_SCREEN,
+  { h: 'Krok 2 · Pop', def: { p: 4, kind: 'loose', label: 'Obrońca 4: zostaje na screenie' }, q: Qch('Obrońca 4 zostaje na screenie. Co robi 4?', ['Pop na skrzydło po rzut', 'Backdoor do kosza', 'Bierze hand-off od 5']), a: [cut(4, [86, 44], [74, 60])], t: '4 robi pop na skrzydło po midrange albo trójkę.' },
+  { h: 'Krok 2 · Pop', q: Qmove(3, [56, 19], '4 wyszedł na skrzydło. Gdzie idzie 3?', 12), a: [cut(3, [56, 19], [64, 34])], t: '3 zawsze robi ruch przeciwny do 4. Skoro 4 wyszedł na obwód, 3 ścina do kosza.' },
+  { h: 'Krok 2 · Pop', q: Qpass(4, '4 jest wolny na skrzydle. Gdzie podaje 5?'), a: [[pas(5, 4)], [shot(4)]], t: 'Pop daje wolny rzut ze skrzydła.' }
+];
+const LP_NOPASS = { h: 'Krok 3 · Nie ma podania do 5', q: Qch('5 jest dobrze kryty. Co robi 3?', ['Kozłuje w stronę 4', 'Podaje do 1 w rogu', 'Ścina do kosza']), a: [drb(3, [71, 49]), mv(5, [60, 30])], t: '3 kozłuje w stronę 4, a 5 wychodzi z low post w stronę topa.' };
+const LP_BC = [
+  LP_NOPASS,
+  { h: 'Krok 3 · Back cut', def: { p: 4, kind: 'tight', label: 'Obrońca 4: ciasno, odcina hand-off' }, q: Qmove(4, 'RIM', 'Obrońca 4 kryje ciasno. Gdzie idzie 4?'), a: [cut(4, 'RIM', [42, 34])], t: 'Kryją cię ciasno, więc back cut: idziesz do kosza za plecami obrońcy.' },
+  { h: 'Krok 3 · Back cut', q: Qch('Jak 3 podaje do 4 na back cut?', ['Bounce pass', 'Lob nad obrońcą', 'Nie podaje, rzuca sam']), a: [[pas(3, 4)], [shot(4)]], t: 'Bounce pass od 3 i lay-up. Bez podania 4 wraca na skrzydło.' }
+];
+const LP_DHO = [
+  LP_NOPASS,
+  { h: 'Krok 3 · Hand-off', def: { p: 4, kind: 'loose', label: 'Obrońca 4: luźno' }, q: Qch('Obrońca 4 kryje luźno. Co robi 4?', ['Bierze hand-off (DHO) od 3', 'Back cut do kosza', 'Zostaje na topie']), a: [[mv(4, [62, 54])], [dho(3, 4)]], t: 'Kryją cię luźno, więc bierzesz piłkę. 4 bierze hand-off od 3.' },
+  { h: 'Krok 3 · Hand-off', q: Qwho(5, 'Kto stawia screen dla 4 po hand-offie?'), a: [[scr(5, [55, 45])], [drb(4, 'RIM', [46, 36])], [shot(4)]], t: '5 wychodzi na topa i stawia screen dla 4. 4 atakuje kosz.' }
+];
+
+const P_START = [
+  { h: 'Krok 1 · Start', q: Qpass(4, 'Start serii Point. Do kogo podaje 1?'), a: [pas(1, 4)], t: 'Podanie slot to slot otwiera serię Point (high post).' },
+  { h: 'Krok 1 · Start', q: Qwho(5, 'Kto stawia back screen dla 1?'), a: [scr(5, [66, 50])], t: '5 wychodzi w górę i stawia back screen dla 1.' },
+  { h: 'Krok 1 · Start', q: Qmove(1, 'RIM', '1 dostaje back screen. Gdzie robi cut?'), a: [cut(1, 'RIM', [60, 32])], t: '1 robi cut do kosza. Jeśli jest wolny, 4 podaje i jest lay-up.' },
+  { h: 'Krok 1 · Start', q: Qmove(1, 'LC', '1 nie dostał podania. Gdzie schodzi?'), a: [cut(1, 'LC', [28, 4]), mv(5, 'HP')], t: 'Bez podania 1 schodzi do corner po ball side. Piłka jest u 4, więc lewy róg. 5 wychodzi na high post.' },
+  { h: 'Krok 1 · Start', q: Qpass(5, '5 jest na high post. Gdzie podaje 4?'), a: [pas(4, 5)], t: '4 podaje do 5 na high post. Teraz 4 wybiera cut: Away albo Over.' }
+];
+const P_CHOOSE = { h: 'Point · Wybór', q: Qwho(4, '5 ma piłkę na high post. Kto wybiera: Away albo Over?'), t: 'Wybór cutu przez 4 decyduje o całej dalszej akcji.' };
+const AWAY = { h: 'Away', q: Qwho(2, 'Away: 4 idzie od piłki i stawia screen. Dla kogo?'), a: [scr(4, [18, 44])], t: 'Away to screen 4 dla 2, z dala od piłki. 2 czyta swojego obrońcę.' };
+const P_AWAY_A = [
+  P_CHOOSE, AWAY,
+  { h: 'Away · wersja a', def: { p: 2, kind: 'tight', label: 'Obrońca 2: ciasno' }, q: Qmove(2, 'RIM', 'Obrońca 2 kryje ciasno. Gdzie biegnie 2?'), a: [cut(2, 'RIM', [26, 20]), mv(4, 'LS')], t: '2 robi cut do kosza po podanie od 5, a 4 robi pop na obwód. Przeciwne ruchy przy screenie.' },
+  { h: 'Away · wersja a', q: Qpass(4, '2 nie dostał piłki. Gdzie podaje 5?'), a: [pas(5, 4)], t: '5 oddaje do 4, który zrobił pop na obwód.' },
+  { h: 'Away · wersja a', q: Qwho(5, 'Kto stawia 4 on-ball screen?'), a: [scr(5, [38, 50])], t: '5 stawia on-ball screen dla 4.' },
+  { h: 'Away · wersja a', q: Qwho(3, 'Kto stawia down screen dla 2?'), a: [[scr(3, [78, 20])], [cut(2, [86, 27], [72, 8]), drb(4, [42, 28], [46, 46])]], t: '3 stawia down screen, 2 wychodzi na midrange albo trójkę. 4 ma dużo miejsca do ataku i shootera obok.' }
+];
+const P_AWAY_B = [
+  P_CHOOSE, AWAY,
+  { h: 'Away · wersja b', def: { p: 2, kind: 'loose', label: 'Obrońca 2: luźno' }, q: Qch('Obrońca 2 kryje luźno. Co robi 2?', ['Pop na topa i DHO od 5', 'Cut do kosza', 'Zostaje na skrzydle']), a: [[cut(2, [44, 43], [28, 50])], [dho(5, 2)]], t: '2 robi pop i bierze hand-off od 5.' },
+  { h: 'Away · wersja b', q: Qmove(4, 'LS', '4 nie robi cutu. Gdzie zostaje?'), a: [mv(4, 'LS'), mv(3, 'RC')], t: '4 zostaje na obwodzie jako safety, a 1 i 3 czekają w cornerach. Cut 4 zabrałby miejsce atakującemu 2.' },
+  { h: 'Away · wersja b', q: Qch('2 ma piłkę po DHO. Co robi?', ['Od razu skręca i atakuje kosz', 'Oddaje do 4', 'Kozłuje do rogu']), a: [[drb(2, 'RIM', [57, 28])], [shot(2)]], t: 'Lane jest pusty, a w obu cornerach stoją shooterzy.' }
+];
+const OVER = { h: 'Over', q: Qmove(4, [77, 41], 'Over: 4 przebiega nad 5 i stawia screen dla 3. Gdzie staje 4?', 12), a: [scr(4, [77, 41], [50, 52])], t: '4 przebiega nad 5, który trzyma piłkę na high post, i stawia screen dla 3 na skrzydle.' };
+const DOWN_FOR_1 = (attacker) => ({ h: 'Weak side', q: Qwho(2, 'Weak side. Kto stawia down screen dla 1?'), a: [[scr(2, [17, 18])], [cut(1, [10, 34], [3, 20]), drb(attacker, attacker === 3 ? [46, 22] : [56, 20], [57, 32])], [shot(attacker)]], t: '2 stawia down screen dla 1. To zajmuje obrońców na weak side i może dać komuś wolny rzut.' });
+const P_OVER_A = [
+  P_CHOOSE, OVER,
+  { h: 'Over · wersja a', def: { p: 3, kind: 'tight', label: 'Obrońca 3: odcina od piłki' }, q: Qmove(3, 'RIM', 'Jest backdoor. Gdzie biegnie 3?'), a: [cut(3, 'RIM', [68, 24])], t: '3 robi cut do kosza po podanie od 5.' },
+  { h: 'Over · wersja a', q: Qmove(3, 'RC', '3 nie dostał piłki. Gdzie wraca?'), a: [cut(3, 'RC', [72, 5])], t: 'Bez podania 3 wraca do corner po tej samej stronie.' },
+  { h: 'Over · wersja a', q: Qch('Co teraz robi 4?', ['Bierze DHO od 5 i atakuje', 'Stawia screen dla 1', 'Ścina do rogu']), a: [[mv(4, [57, 42])], [dho(5, 4)]], t: '4 bierze hand-off od 5, od razu się obraca i atakuje kosz.' },
+  DOWN_FOR_1(4)
+];
+const P_OVER_B = [
+  P_CHOOSE, OVER,
+  { h: 'Over · wersja b', def: { p: 3, kind: 'loose', label: 'Obrońca 3: brak backdooru' }, q: Qch('Backdooru nie ma. Co robi 3?', ['Wychodzi po screenie po DHO od 5', 'Cut do kosza', 'Zostaje na skrzydle']), a: [[cut(3, [57, 44], [74, 50])], [dho(5, 3)]], t: '3 wychodzi po screenie do 5 i bierze DHO na topie.' },
+  { h: 'Over · wersja b', q: Qmove(4, 'RSC', '4 robi roll. Gdzie?', 12), a: [cut(4, 'RSC', [76, 26])], t: '4 robi roll do short corner albo na trójkę, zależnie od rzutu.' },
+  DOWN_FOR_1(3)
+];
+
+const C_START = [
+  { h: 'Krok 1 · Start', q: Qch('Start serii Chin. Co robi 1?', ['Kozłuje do 3 i robi z nim hand-off', 'Podaje do 4 (slot to slot)', 'Podaje do 3 i ścina do rogu']), a: [[drb(1, [79, 46]), mv(3, [84, 41])], [dho(1, 3)], [drb(3, 'RS', [80, 56]), mv(1, 'RW')]], t: '1 kozłuje do 3 i robi z nim hand-off. 3 wychodzi z piłką na slot, 1 zostaje na skrzydle.' },
+  { h: 'Krok 1 · Start', q: Qmove(4, 'LW', 'Po drugiej stronie 2 i 4 robią exchange. Gdzie idzie 4?'), a: [mv(4, 'LW', [16, 50]), mv(2, 'LS', [26, 40])], t: 'Exchange: 2 i 4 zamieniają się miejscami.' },
+  { h: 'Krok 1 · Start', q: Qmove(5, [60, 38], 'Gdzie wychodzi 5?', 12), a: [mv(5, [60, 38])], t: '5 wychodzi z low post na high post.' },
+  { h: 'Krok 2 · Shuffle cut', q: Qpass(2, 'Piłka krąży po obwodzie. Gdzie podaje 3?'), a: [pas(3, 2)], t: 'Piłka idzie 3 → 2 → 4.' },
+  { h: 'Krok 2 · Shuffle cut', q: Qpass(4, 'Gdzie podaje 2?'), a: [pas(2, 4)], t: '2 podaje dalej do 4 na skrzydle.' },
+  { h: 'Krok 2 · Shuffle cut', q: Qwho(5, '3 podał. Kto stawia mu back screen?'), a: [scr(5, [64, 50])], t: '5 stawia back screen dla 3.' },
+  { h: 'Krok 2 · Shuffle cut', q: Qmove(3, 'RIM', 'Shuffle cut! Gdzie biegnie 3?'), a: [cut(3, 'RIM', [62, 30])], t: '3 robi shuffle cut do kosza po podanie od 4. To często wolny lay-up.' },
+  { h: 'Krok 2 · Shuffle cut', q: Qmove(3, 'LC', '3 nie dostał podania. Gdzie schodzi?'), a: [cut(3, 'LC', [28, 4])], t: 'Bez podania 3 schodzi do corner po ball side. Piłka jest u 4 na lewym skrzydle, więc lewy róg.' }
+];
+const FLARE = { h: 'Flare', q: Qwho(5, 'Po shuffle cucie 5 stawia flare screen. Dla kogo?'), a: [scr(5, [42, 52])], t: '5 stawia flare screen dla 2. 2 czyta obrońcę: pop i rzut albo curl do kosza.' };
+const FLARE_POP = { h: 'Krok 3a · Flare: pop', q: Qmove(2, [64, 59], '2 robi pop po flare screenie. W którą stronę?', 13), a: [[cut(2, [64, 59], [46, 66])], [pas(4, 2)]], t: '2 odchodzi od piłki za screenem 5, a 4 podaje do 2.' };
+const C_POP = [
+  FLARE, FLARE_POP,
+  { h: 'Krok 3a · Flare: pop', def: { p: 2, kind: 'loose', label: 'Obrońca 2: daleko' }, q: Qch('2 łapie piłkę i jest wolny. Co robi?', ['Catch-and-shoot', 'Czeka na screen od 5', 'Oddaje do 4']), a: [shot(2)], t: 'Jesteś wolny, to rzucasz. Decyzję podejmujesz po złapaniu piłki.' }
+];
+const C_POP_COVERED = [
+  FLARE, FLARE_POP,
+  { h: 'Krok 3a · Kryty', def: { p: 2, kind: 'tight', label: 'Obrońca 2: dobiegł' }, q: Qch('2 łapie piłkę, ale obrońca dobiegł. Co robi?', ['Czeka na drugi screen od 5 i atakuje', 'Rzuca mimo wszystko', 'Oddaje do 4']), t: 'Obrońca dobiegł, więc czekasz na drugi screen od 5 i atakujesz kosz.' },
+  { h: 'Krok 3a · Kryty', q: Qwho(5, 'Kto stawia on-ball screen dla 2?'), a: [[scr(5, [57, 54])], [drb(2, 'RIM', [57, 38]), mv(1, 'RC')], [shot(2)]], t: '5 stawia on-ball screen i 2 atakuje. Shooterzy czekają w obu cornerach.' }
+];
+const C_CURL = [
+  FLARE,
+  { h: 'Krok 3b · Flare: curl', def: { p: 2, kind: 'tight', label: 'Obrońca 2: goni za screenem' }, q: Qmove(2, 'RIM', 'Obrońca goni 2 nad screenem. Gdzie robi curl?'), a: [cut(2, 'RIM', [50, 44])], t: '2 robi curl wokół screena do kosza po podanie od 4.' },
+  { h: 'Krok 3b · Flare: curl', q: Qmove(2, 'RC', '2 nie dostał piłki. Gdzie schodzi?'), a: [cut(2, 'RC', [72, 5])], t: 'Bez podania 2 schodzi do corner na weak side.' },
+  { h: 'Krok 3b · Flare: curl', q: Qwho(5, 'Kto stawia on-ball screen dla 4?'), a: [[scr(5, [19, 42])], [drb(4, [46, 26], [30, 46])]], t: '5 biegnie postawić on-ball screen dla 4, a 4 atakuje.' },
+  { h: 'Krok 3b · Flare: curl', q: Qch('Lay-upu nie ma. Gdzie 4 szuka podania?', ['Do shooterów na weak side', 'Wraca z piłką na topa', 'Do 5 przy linii końcowej']), a: [[pas(4, 2)], [shot(2)]], t: 'Na weak side czekają dwaj shooterzy: 1 na skrzydle i 2 w rogu.' }
+];
+
+const SERIES = [
+  { id: 'base', name: 'Podstawy', tag: '2-2-1', desc: 'Numery dotyczą miejsc, nie osób. Kto stoi na danej pozycji, robi to, co ta pozycja.', drills: [
+    { id: 'ustawienie', name: 'Ustawienie wyjściowe', sub: 'Postaw całą piątkę na miejscach', init: BENCH, steps: SETUP }
+  ] },
+  { id: 'lp', name: 'Low Post', tag: 'Seria 1', desc: 'Gramy przez 5 na low post. Gdy nie ma podania do 5, 3 uruchamia 4 kozłem.', drills: [
+    { id: 'lp-wejscie', name: 'Wejście i podanie do 5', sub: 'Krok 1', steps: LP_E },
+    { id: 'lp-backdoor', name: 'Piłka u 5: backdoor 4', sub: 'Krok 2 · obrońca over the screen', pre: LP_E, steps: LP_BD },
+    { id: 'lp-pop', name: 'Piłka u 5: pop 4', sub: 'Krok 2 · obrońca zostaje na screenie', pre: LP_E, steps: LP_POP },
+    { id: 'lp-backcut', name: 'Brak podania do 5: back cut', sub: 'Krok 3 · kryją ciasno', pre: LP_E.slice(0, 3), steps: LP_BC },
+    { id: 'lp-dho', name: 'Brak podania do 5: hand-off', sub: 'Krok 3 · kryją luźno', pre: LP_E.slice(0, 3), steps: LP_DHO }
+  ] },
+  { id: 'pt', name: 'Point', tag: 'Seria 2', desc: 'Start to podanie slot to slot. 5 dostaje piłkę na high post, a 4 wybiera cut: Away albo Over.', drills: [
+    { id: 'pt-start', name: 'Start: slot to slot', sub: 'Krok 1 · back screen 5 dla 1', steps: P_START },
+    { id: 'pt-away-a', name: 'Away a: 2 cut, 4 pop', sub: 'Obrońca 2 ciasno', pre: P_START, steps: P_AWAY_A },
+    { id: 'pt-away-b', name: 'Away b: 2 pop i DHO', sub: 'Obrońca 2 luźno', pre: P_START, steps: P_AWAY_B },
+    { id: 'pt-over-a', name: 'Over a: 3 cut, 4 bierze DHO', sub: 'Jest backdoor', pre: P_START, steps: P_OVER_A },
+    { id: 'pt-over-b', name: 'Over b: 3 bierze DHO, 4 roll', sub: 'Nie ma backdooru', pre: P_START, steps: P_OVER_B }
+  ] },
+  { id: 'ch', name: 'Chin', tag: 'Seria 3', desc: 'Hand-off na jednym skrzydle i exchange na drugim. Potem piłka krąży, a 5 stawia kolejne screeny.', drills: [
+    { id: 'ch-start', name: 'Start i shuffle cut', sub: 'Kroki 1–2', steps: C_START },
+    { id: 'ch-flare-pop', name: 'Flare: pop i rzut', sub: 'Krok 3a · 2 wolny', pre: C_START, steps: C_POP },
+    { id: 'ch-flare-kryty', name: 'Flare: kryty, drugi screen', sub: 'Krok 3a · obrońca dobiegł', pre: C_START, steps: C_POP_COVERED },
+    { id: 'ch-curl', name: 'Flare: curl', sub: 'Krok 3b · obrońca goni', pre: C_START, steps: C_CURL }
+  ] }
+];
+const DRILLS = [];
+SERIES.forEach(s => s.drills.forEach(d => { d.series = s; DRILLS.push(d); }));
+
+const TRIGGERS = [
+  ['1 podał na skrzydło', '1 robi cut do corner na weak side: start Low Post'],
+  ['Piłka trafiła do 5 na low post', '3 stawia screen dla 4, obaj robią przeciwne ruchy'],
+  ['Nie ma podania do 5 na low post', '3 kozłuje w stronę 4'],
+  ['Dribble w twoją stronę, kryją cię ciasno', 'Back cut'],
+  ['Dribble w twoją stronę, kryją cię luźno', 'Bierzesz hand-off (DHO)'],
+  ['Podanie slot to slot', '5 stawia back screen dla podającego: start Point'],
+  ['5 ma piłkę na high post', '4 wybiera: Away albo Over'],
+  ['Obrońca idzie over the screen', 'Backdoor do kosza'],
+  ['Obrońca zostaje na screenie', 'Pop na obwód po rzut'],
+  ['Hand-off na skrzydle', 'Exchange na drugim skrzydle: start Chin'],
+  ['Podanie po obwodzie przy 5 na high post', 'Back screen i shuffle cut do kosza'],
+  ['Flare screen, jesteś wolny', 'Catch-and-shoot'],
+  ['Flare screen, obrońca goni', 'Curl do kosza'],
+  ['Nie dostałeś piłki po cucie', 'Schodzisz do corner lub na wing'],
+  ['Właśnie podałeś piłkę', 'Cut, screen albo zmiana miejsca. Nie stoisz.'],
+  ['Jakich rzutów szukamy?', 'Lay-up albo open three']
+];
+const RULES = [
+  ['Czytamy, nie biegniemy na pamięć.', 'Zanim użyjesz screena albo ruszysz do cutu, spójrz, co robi twój obrońca.'],
+  ['Kryją cię ciasno = back cut.', 'Idziesz do kosza za plecami obrońcy.'],
+  ['Kryją cię luźno = bierzesz piłkę.', 'Hand-off (DHO) albo pop na obwód.'],
+  ['Podanie i ruch.', 'Po podaniu nie stoisz: robisz cut, stawiasz screen albo zmieniasz miejsce.'],
+  ['Nie dostałeś piłki = wychodzisz.', 'Po cucie idziesz na wolne miejsce (wing lub corner).'],
+  ['Dwaj zawodnicy przy screenie robią przeciwne ruchy.', 'Jeden idzie do kosza, drugi robi pop na obwód.'],
+  ['Rzuty, których szukamy:', 'lay-up albo open three.'],
+  ['Każdy trzyma swoje miejsce.', 'Jedna osoba poza systemem psuje spacing i cały atak staje.']
+];
+
+/* ================= Pamięć wyników (tylko w tej przeglądarce) ================= */
+const KEY = 'princeton-trener-v1';
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
+const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} };
+
+/* ================= Narzędzia ================= */
+const $ = (sel, root = document) => root.querySelector(sel);
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+const ctrl = (a, b, via) => via ? [2 * via[0] - (a[0] + b[0]) / 2, 2 * via[1] - (a[1] + b[1]) / 2] : [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+const qb = (a, c, b, t) => { const u = 1 - t; return [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]]; };
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const starsFor = m => m === 0 ? 3 : m === 1 ? 2 : 1;
+const starHTML = (n, cls = 'stars') => `<span class="${cls}">${[0, 1, 2].map(i => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span>`;
+const ICON_BACK = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+
+function normSteps(steps) {
+  return steps.map(s => {
+    let g = s.a ? (Array.isArray(s.a[0]) ? s.a.map(x => x.slice()) : [s.a.slice()]) : [];
+    if (s.q && s.q.type === 'move' && !g.some(gr => gr.some(a => a.p === s.q.p && a.to))) g.unshift([mv(s.q.p, s.q.to)]);
+    return Object.assign({}, s, { groups: g });
+  });
+}
+
+/* ================= Ekran główny ================= */
+function renderHome() {
+  const total = DRILLS.length * 3;
+  const got = DRILLS.reduce((n, d) => n + (saved[d.id] || 0), 0);
+  const best = saved.__trig || 0;
+  $('#home').innerHTML = `
+    <header class="hero">
+      <div class="eyebrow">Atak pozycyjny · ${DRILLS.length} sytuacji z rozpiski</div>
+      <h1>Princeton<br><span>Offense</span></h1>
+      <p>Przesuwaj zawodników na boisku, wybieraj podania i czytaj obronę. Każda sytuacja to kilka szybkich decyzji, dokładnie jak w rozpisce trenera.</p>
+      <div class="tally"><span><b>${got}</b>/ ${total} zdobytych piłek</span><span><b>${best}</b>rekord w triggerach</span></div>
+    </header>
+    <div class="me" id="me-box"></div>
+    <button class="quick" id="go-trig">
+      <strong>Triggery: szybka gra</strong>
+      <small>Jeśli… to…  10 pytań na czas</small>
+      <span class="go">${ICON_PLAY}</span>
+    </button>
+    <section class="board">
+      <div class="series-head"><h2>Ranking</h2><span class="tag">drużyna</span></div>
+      <div class="tabs" role="group" aria-label="Rodzaj rankingu">
+        <button id="tab-pts" aria-pressed="${boardTab === 'pts'}">Punkty</button>
+        <button id="tab-try" aria-pressed="${boardTab === 'try'}">Tryhard</button>
+      </div>
+      <ol class="rank" id="rank"></ol>
+    </section>
+    ${SERIES.map(s => `
+      <section class="series">
+        <div class="series-head"><h2>${s.name}</h2><span class="tag">${s.tag}</span></div>
+        <p>${s.desc}</p>
+        ${s.drills.map(d => `
+          <div class="drill">
+            <div class="drill-name">${d.name}${saved[d.id] ? starHTML(saved[d.id]) : ''}<small>${d.sub}</small></div>
+            <div class="drill-btns">
+              <button class="btn" data-watch="${d.id}">Pokaż</button>
+              <button class="btn primary" data-play="${d.id}">Graj</button>
+            </div>
+          </div>`).join('')}
+      </section>`).join('')}
+    <details class="rules">
+      <summary>Zasady obowiązujące zawsze</summary>
+      <ol>${RULES.map(r => `<li><b>${r[0]}</b> ${r[1]}</li>`).join('')}</ol>
+    </details>
+    <p class="foot">Na podstawie rozpiski „Princeton Offense: możliwości dla zawodników”. Wyniki zapisują się tylko na tym telefonie.</p>`;
+  $('#go-trig').onclick = startTriggers;
+  $('#tab-pts').onclick = () => setTab('pts');
+  $('#tab-try').onclick = () => setTab('try');
+  renderMe(); renderBoard();
+  $('#home').querySelectorAll('[data-play]').forEach(b => b.onclick = () => startDrill(b.dataset.play, 'play'));
+  $('#home').querySelectorAll('[data-watch]').forEach(b => b.onclick = () => startDrill(b.dataset.watch, 'watch'));
+}
+function show(id) {
+  ['home', 'game', 'trig'].forEach(x => $('#' + x).hidden = x !== id);
+  $('#overlay').hidden = true;
+  window.scrollTo(0, 0);
+}
+function recordUnfinished() {
+  if (G && !G.recorded && G.answers > 0) { G.recorded = true; record({ answers: G.answers, correct: G.correct, ms: performance.now() - G.t0 }); }
+  if (T && !T.recorded && T.answers > 0) { T.recorded = true; record({ answers: T.answers, correct: T.ok, ms: performance.now() - T.t0 }); }
+}
+function goHome() { recordUnfinished(); epoch++; clearTimer(); renderHome(); show('home'); try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }
+
+/* ================= Boisko SVG ================= */
+let svg, gTrails, gMarks, gDef, gPlayers, gBall, gFx, players = {};
+function buildCourt(box) {
+  svg = el('svg', { id: 'court', viewBox: '0 0 100 78', role: 'img', 'aria-label': 'Boisko, kosz u góry' });
+  const defs = el('defs', {}, svg);
+  [['arr-a', 'var(--accent)'], ['arr-i', 'var(--ink)']].forEach(([id, c]) => {
+    const m = el('marker', { id, viewBox: '0 0 10 10', refX: 7, refY: 5, markerWidth: 4.2, markerHeight: 4.2, orient: 'auto-start-reverse', markerUnits: 'strokeWidth' }, defs);
+    el('path', { d: 'M0 0 L10 5 L0 10 z', style: `fill:${c}` }, m);
+  });
+  el('rect', { class: 'court-floor', x: 0, y: 0, width: 100, height: 78 }, svg);
+  el('rect', { class: 'court-paint', x: 39, y: 0, width: 22, height: 37 }, svg);
+  el('rect', { class: 'cl', x: 39, y: 0, width: 22, height: 37 }, svg);
+  el('path', { class: 'cl', d: 'M42 37 A8 8 0 0 0 58 37' }, svg);
+  el('path', { class: 'cl', d: 'M42 37 A8 8 0 0 1 58 37', 'stroke-dasharray': '1.4 1.2' }, svg);
+  el('path', { class: 'cl', d: 'M8 0 V16.2 A43 43 0 0 0 92 16.2 V0' }, svg);
+  el('path', { class: 'cl', d: 'M45 7 A5 5 0 0 0 55 7' }, svg);
+  el('path', { class: 'cl', d: 'M42 78 A8 8 0 0 1 58 78' }, svg);
+  el('line', { class: 'cl', x1: 45, y1: 3.6, x2: 55, y2: 3.6, 'stroke-width': .9 }, svg);
+  el('circle', { class: 'rim', cx: 50, cy: 6.4, r: 1.7 }, svg);
+  [[36, 15], [64, 15]].forEach(([x, y]) => el('line', { class: 'cl', x1: x === 36 ? 39 : 61, y1: y, x2: x === 36 ? 37.6 : 62.4, y2: y }, svg));
+  gTrails = el('g', {}, svg); gMarks = el('g', {}, svg); gDef = el('g', { class: 'def' }, svg);
+  gPlayers = el('g', {}, svg);
+  gBall = el('g', { id: 'ball' }, svg);
+  el('circle', { r: 1.5 }, gBall); el('path', { d: 'M-1.5 0 H1.5 M0 -1.5 V1.5' }, gBall);
+  gFx = el('g', {}, svg);
+  players = {};
+  for (let i = 1; i <= 5; i++) {
+    const g = el('g', { class: 'pl', 'data-id': i }, gPlayers);
+    el('circle', { class: 'ring', r: 4.6 }, g);
+    el('circle', { class: 'body', r: 3.5 }, g);
+    const t = el('text', {}, g); t.textContent = i;
+    players[i] = g;
+  }
+  box.appendChild(svg);
+  svg.addEventListener('pointerdown', onDown);
+  svg.addEventListener('pointermove', onMove);
+  svg.addEventListener('pointerup', onUp);
+  svg.addEventListener('pointercancel', onUp);
+}
+function svgPt(e) {
+  const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY;
+  const r = p.matrixTransform(svg.getScreenCTM().inverse()); return [r.x, r.y];
+}
+function render() {
+  for (let i = 1; i <= 5; i++) {
+    const p = st.pos[i]; players[i].setAttribute('transform', `translate(${p[0].toFixed(2)} ${p[1].toFixed(2)})`);
+  }
+  let b = st.ballXY || (st.ball ? [st.pos[st.ball][0] + 2.7, st.pos[st.ball][1] - 2.7] : null);
+  gBall.style.display = b ? '' : 'none';
+  if (b) gBall.setAttribute('transform', `translate(${b[0].toFixed(2)} ${b[1].toFixed(2)})`);
+  if (st.def) {
+    const p = st.pos[st.def.p];
+    const toward = st.def.kind === 'tight' && st.ball && st.ball !== st.def.p ? st.pos[st.ball] : BASKET;
+    const d = dist(p, toward) || 1, off = st.def.kind === 'tight' ? 4.6 : 8.5;
+    const x = p[0] + (toward[0] - p[0]) / d * off, y = p[1] + (toward[1] - p[1]) / d * off;
+    gDef.innerHTML = '';
+    el('line', { x1: x - 1.6, y1: y - 1.6, x2: x + 1.6, y2: y + 1.6 }, gDef);
+    el('line', { x1: x - 1.6, y1: y + 1.6, x2: x + 1.6, y2: y - 1.6 }, gDef);
+  } else gDef.innerHTML = '';
+}
+function setPlayerClass(id, cls) { const g = players[id]; g.setAttribute('class', 'pl' + (cls ? ' ' + cls : '')); }
+function clearPlayerClasses() { for (let i = 1; i <= 5; i++) setPlayerClass(i, ''); }
+function ageTrails() {
+  [...gTrails.children].forEach(c => { if (c.classList.contains('old')) c.remove(); else c.classList.add('old'); });
+  gMarks.innerHTML = '';
+}
+function drawTrail(kind, a, c, b) {
+  const g = el('g', {}, gTrails);
+  const d = `M${a[0]} ${a[1]} Q${c[0]} ${c[1]} ${b[0]} ${b[1]}`;
+  if (kind === 'screen') {
+    el('path', { class: 'tr screen', d }, g);
+    const t = qb(a, c, b, .98), dx = b[0] - t[0], dy = b[1] - t[1], L = Math.hypot(dx, dy) || 1;
+    const nx = -dy / L * 2.4, ny = dx / L * 2.4, ex = b[0] + dx / L * 3.6, ey = b[1] + dy / L * 3.6;
+    el('line', { class: 'tr bar', x1: ex - nx, y1: ey - ny, x2: ex + nx, y2: ey + ny }, g);
+    // nie zasłaniaj zawodnika końcówką linii
+  } else {
+    const shorten = (kind === 'pass' || kind === 'dho') ? 4.2 : 3.8;
+    const L = dist(a, b);
+    if (L < 4) return;
+    const tEnd = 1 - shorten / Math.max(L, 1), tStart = (kind === 'pass' || kind === 'dho') ? 3.4 / L : 0;
+    const p0 = qb(a, c, b, tStart), p1 = qb(a, c, b, tEnd);
+    const cc = qb(a, c, b, (tStart + tEnd) / 2);
+    const c2 = [2 * cc[0] - (p0[0] + p1[0]) / 2, 2 * cc[1] - (p0[1] + p1[1]) / 2];
+    el('path', { class: 'tr ' + (kind === 'dho' ? 'pass' : kind), d: `M${p0[0]} ${p0[1]} Q${c2[0]} ${c2[1]} ${p1[0]} ${p1[1]}`, 'marker-end': `url(#${kind === 'pass' || kind === 'dho' || kind === 'screen' ? 'arr-i' : 'arr-a'})` }, g);
+  }
+}
+
+/* ================= Animacje ================= */
+let epoch = 0;
+function tween(dur, fn) {
+  const my = epoch;
+  if (reduced) dur = Math.min(dur, 60);
+  return new Promise(res => {
+    const t0 = performance.now();
+    const f = now => {
+      if (my !== epoch) return res();
+      const k = Math.min(1, (now - t0) / dur);
+      fn(ease(k));
+      if (k < 1) requestAnimationFrame(f); else res();
+    };
+    requestAnimationFrame(f);
+  });
+}
+const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms));
+async function act(a, sp) {
+  const my = epoch;
+  if (a.k === 'ball') { st.ball = a.p; render(); return; }
+  if (['move', 'cut', 'dribble', 'screen'].includes(a.k)) {
+    const from = st.pos[a.p].slice(), to = pt(a.to), c = ctrl(from, to, a.via);
+    drawTrail(a.k, from, c, to);
+    const dur = clamp(dist(from, to) * 17, 320, 1150) / sp;
+    await tween(dur, k => { st.pos[a.p] = qb(from, c, to, k); render(); });
+    if (my === epoch) { st.pos[a.p] = to; render(); }
+    return;
+  }
+  if (a.k === 'pass' || a.k === 'dho') {
+    const A = st.pos[a.from].slice(), B = st.pos[a.to].slice();
+    drawTrail(a.k, A, ctrl(A, B), B);
+    if (a.k === 'dho') {
+      const m = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2], dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy) || 1;
+      const nx = -dy / L * 1.8, ny = dx / L * 1.8, ux = dx / L * .6, uy = dy / L * .6;
+      [-1, 1].forEach(s => el('line', { class: 'tr bar', x1: m[0] + s * ux - nx, y1: m[1] + s * uy - ny, x2: m[0] + s * ux + nx, y2: m[1] + s * uy + ny }, gTrails));
+    }
+    const s0 = [A[0] + 2.7, A[1] - 2.7], s1 = [B[0] + 2.7, B[1] - 2.7];
+    st.ball = null;
+    await tween(clamp(dist(A, B) * 9, 260, 620) / sp, k => { st.ballXY = [s0[0] + (s1[0] - s0[0]) * k, s0[1] + (s1[1] - s0[1]) * k]; render(); });
+    if (my === epoch) { st.ballXY = null; st.ball = a.to; render(); }
+    return;
+  }
+  if (a.k === 'shot') {
+    const A = st.pos[a.from], s0 = [A[0] + 2.7, A[1] - 2.7], B = [50, 6.4];
+    const c = [(s0[0] + B[0]) / 2, Math.min(s0[1], B[1]) - 16 * (dist(A, B) > 20 ? 1 : .4)];
+    st.ball = null;
+    await tween(clamp(dist(A, B) * 14, 420, 900) / sp, k => { st.ballXY = qb(s0, c, B, k); render(); });
+    if (my !== epoch) return;
+    const isLay = dist(A, B) < 14;
+    const t = el('text', { class: 'fx', x: 50, y: 18 }, gFx); t.textContent = isLay ? '+2 LAY-UP' : (dist(A, B) > 40 ? '+3 OPEN THREE' : '+2');
+    setTimeout(() => t.remove(), 1200);
+    st.ballXY = null; render();
+  }
+}
+async function runGroups(groups, sp = 1) {
+  for (const g of groups) {
+    const my = epoch;
+    await Promise.all(g.map(a => act(a, sp)));
+    if (my !== epoch) return;
+  }
+}
+
+/* ================= Gra / pokaz ================= */
+let st = null;   // stan boiska
+let G = null;    // stan rozgrywki
+let waiting = null;
+function initState(drill) {
+  const src = drill.init || INIT;
+  const pos = {}; for (let i = 1; i <= 5; i++) pos[i] = pt(src.pos[i]);
+  return { pos, ball: src.ball, ballXY: null, def: null };
+}
+
+function startDrill(id, mode) {
+  const drill = DRILLS.find(d => d.id === id); if (!drill) return goHome();
+  recordUnfinished();
+  epoch++;
+  T = null;
+  G = { drill, mode, i: 0, score: 0, streak: 0, mistakes: 0, answers: 0, correct: 0, t0: performance.now(), pre: normSteps(drill.pre || []), steps: normSteps(drill.steps) };
+  if (mode === 'watch') { G.steps = G.pre.concat(G.steps); G.pre = []; }
+  st = initState(drill);
+  const g = $('#game');
+  g.innerHTML = `
+    <div class="bar">
+      <button class="icon-btn" id="g-back" aria-label="Wróć do menu">${ICON_BACK}</button>
+      <div class="bar-title"><div class="s">${drill.series.name}${mode === 'watch' ? ' · pokaz' : ''}</div><div class="n">${drill.name}</div></div>
+      <div class="score" id="g-score"></div>
+    </div>
+    <div class="progress"><i id="g-prog"></i></div>
+    <div class="court-box" id="g-court"></div>
+    <div class="panel" id="g-panel">
+      <div class="kick"><span class="h" id="g-h"></span><span class="deftag" id="g-def" hidden></span></div>
+      <p class="prompt" id="g-prompt"></p>
+      <p class="hint" id="g-hint"></p>
+      <div class="choices" id="g-choices"></div>
+      <div class="fb" id="g-fb" hidden><div class="fb-head" id="g-fbh"></div><p id="g-fbt"></p></div>
+      <label class="watch-row" id="g-auto-row" hidden><input type="checkbox" id="g-auto"> Odtwarzaj automatycznie</label>
+      <button class="next" id="g-next" hidden>Dalej</button>
+    </div>`;
+  buildCourt($('#g-court'));
+  $('#g-back').onclick = goHome;
+  show('game');
+  try { history.replaceState(null, '', '#' + drill.id); } catch (e) {}
+  render(); updateScore();
+  runDrill();
+}
+function updateScore() {
+  if (G.mode === 'watch') { $('#g-score').innerHTML = `<small>krok</small><b>${Math.min(G.i + 1, G.steps.length)}/${G.steps.length}</b>`; }
+  else $('#g-score').innerHTML = `<b>${G.score}</b><small class="${G.streak >= 2 ? 'hot' : ''}">${G.streak >= 2 ? 'seria ×' + G.streak : 'punkty'}</small>`;
+  $('#g-prog').style.width = (G.i / G.steps.length * 100) + '%';
+}
+function panelReset() {
+  $('#g-choices').innerHTML = ''; $('#g-fb').hidden = true; $('#g-next').hidden = true; $('#g-hint').textContent = '';
+  $('#g-def').hidden = true; $('#g-auto-row').hidden = true;
+}
+async function runDrill() {
+  const my = epoch;
+  if (G.pre.length) {
+    panelReset();
+    $('#g-h').textContent = 'Ustawiam sytuację';
+    for (const s of G.pre) {
+      if (my !== epoch) return;
+      ageTrails();
+      $('#g-prompt').textContent = s.h.replace(/^Krok \d+ · /, '');
+      $('#g-hint').textContent = s.t;
+      await runGroups(s.groups, 2.4);
+      await wait(150);
+    }
+    if (my !== epoch) return;
+    ageTrails(); ageTrails();
+  }
+  for (G.i = 0; G.i < G.steps.length; G.i++) {
+    if (my !== epoch) return;
+    updateScore();
+    if (G.mode === 'watch') await watchStep(G.steps[G.i]); else await playStep(G.steps[G.i]);
+  }
+  if (my !== epoch) return;
+  G.i = G.steps.length; updateScore();
+  finish();
+}
+
+async function watchStep(s) {
+  const my = epoch;
+  panelReset(); ageTrails(); clearPlayerClasses();
+  $('#g-h').textContent = s.h;
+  st.def = s.def || null; render();
+  if (s.def) { $('#g-def').hidden = false; $('#g-def').textContent = s.def.label; }
+  $('#g-prompt').textContent = s.t;
+  $('#g-auto-row').hidden = false;
+  const auto = $('#g-auto'); auto.checked = !!G.auto; auto.onchange = () => { G.auto = auto.checked; if (G.auto && !nextBtn.disabled) nextBtn.click(); };
+  const nextBtn = $('#g-next'); nextBtn.hidden = false; nextBtn.disabled = true;
+  nextBtn.textContent = G.i === G.steps.length - 1 ? 'Koniec' : 'Dalej';
+  await runGroups(s.groups, 1);
+  if (my !== epoch) return;
+  st.def = null; render();
+  nextBtn.disabled = false;
+  await new Promise(res => {
+    nextBtn.onclick = res;
+    if (G.auto) setTimeout(() => { if (my === epoch && G.auto) res(); }, 1400);
+  });
+}
+
+async function playStep(s) {
+  const my = epoch, q = s.q;
+  panelReset(); ageTrails(); clearPlayerClasses();
+  $('#g-h').textContent = s.h;
+  st.def = s.def || null; render();
+  if (s.def) { $('#g-def').hidden = false; $('#g-def').textContent = s.def.label; }
+  $('#g-prompt').textContent = q.text;
+  let correct, answerNote = '';
+  if (q.type === 'move') {
+    setPlayerClass(q.p, 'active');
+    $('#g-hint').textContent = `Stuknij miejsce na boisku albo przeciągnij zawodnika ${q.p}.`;
+    const orig = st.pos[q.p].slice();
+    const ghost = el('circle', { class: 'ghost', cx: orig[0], cy: orig[1], r: 3.5 }, gMarks);
+    const drop = await new Promise(res => { waiting = { type: 'move', p: q.p, res }; });
+    if (my !== epoch) return;
+    const target = pt(q.to), tol = q.tol || 11;
+    correct = dist(drop, target) <= tol;
+    ghost.remove();
+    if (correct) el('circle', { class: 'drop-good', cx: drop[0], cy: drop[1], r: 2.2 }, gMarks);
+    else {
+      el('line', { class: 'drop-bad', x1: drop[0] - 1.8, y1: drop[1] - 1.8, x2: drop[0] + 1.8, y2: drop[1] + 1.8 }, gMarks);
+      el('line', { class: 'drop-bad', x1: drop[0] - 1.8, y1: drop[1] + 1.8, x2: drop[0] + 1.8, y2: drop[1] - 1.8 }, gMarks);
+      el('circle', { class: 'target', cx: target[0], cy: target[1], r: tol * .55 }, gMarks);
+      answerNote = 'Zielone pole to właściwe miejsce. ';
+    }
+    st.pos[q.p] = orig; setPlayerClass(q.p, ''); render();
+  } else if (q.type === 'pass' || q.type === 'who') {
+    for (let i = 1; i <= 5; i++) if (!(q.type === 'pass' && i === st.ball)) setPlayerClass(i, 'pick');
+    $('#g-hint').textContent = q.type === 'pass' ? 'Stuknij zawodnika, który dostaje piłkę.' : 'Stuknij właściwego zawodnika.';
+    const picked = await new Promise(res => { waiting = { type: 'pick', exclude: q.type === 'pass' ? st.ball : null, res }; });
+    if (my !== epoch) return;
+    correct = picked === q.ans;
+    clearPlayerClasses();
+    setPlayerClass(q.ans, 'good');
+    if (!correct) { setPlayerClass(picked, 'bad'); answerNote = `Właściwa odpowiedź: ${q.ans}. `; }
+  } else {
+    const box = $('#g-choices');
+    const opts = shuffle(q.opts.map((t, i) => ({ t, ok: i === 0 })));
+    const picked = await new Promise(res => {
+      opts.forEach(o => {
+        const b = document.createElement('button'); b.className = 'choice'; b.textContent = o.t;
+        b.onclick = () => res({ o, b }); o.btn = b; box.appendChild(b);
+      });
+    });
+    if (my !== epoch) return;
+    correct = picked.o.ok;
+    opts.forEach(o => { o.btn.disabled = true; if (o.ok) o.btn.classList.add('good'); });
+    if (!correct) picked.b.classList.add('bad');
+  }
+  waiting = null;
+  $('#g-hint').textContent = '';
+  // wynik
+  let gain = 0;
+  G.answers++;
+  if (correct) { G.correct++; G.streak++; gain = 100 + Math.min(G.streak - 1, 5) * 20; G.score += gain; }
+  else { G.streak = 0; G.mistakes++; buzz(120); }
+  updateScore();
+  const fb = $('#g-fb'); fb.className = 'fb ' + (correct ? 'good' : 'bad'); fb.hidden = false;
+  $('#g-fbh').textContent = correct ? `Dobrze! +${gain}` : 'Nie tym razem';
+  $('#g-fbt').textContent = answerNote + s.t;
+  const nextBtn = $('#g-next'); nextBtn.hidden = false; nextBtn.disabled = true;
+  nextBtn.textContent = G.i === G.steps.length - 1 ? 'Podsumowanie' : 'Dalej';
+  await runGroups(s.groups, 1);
+  if (my !== epoch) return;
+  st.def = null; render();
+  nextBtn.disabled = false; nextBtn.focus({ preventScroll: true });
+  await new Promise(res => { nextBtn.onclick = res; });
+}
+
+/* --- dotyk na boisku --- */
+let drag = null;
+function nearestPlayer(p, exclude) {
+  let best = null, bd = 7.5;
+  for (let i = 1; i <= 5; i++) { if (i === exclude) continue; const d = dist(p, st.pos[i]); if (d < bd) { bd = d; best = i; } }
+  return best;
+}
+function onDown(e) {
+  if (!waiting) return;
+  const p = svgPt(e);
+  if (waiting.type === 'pick') {
+    const id = nearestPlayer(p, waiting.exclude);
+    if (id) { const w = waiting; waiting = null; w.res(id); }
+    return;
+  }
+  if (waiting.type === 'move') {
+    e.preventDefault();
+    svg.setPointerCapture(e.pointerId);
+    drag = { start: p, moved: false, onPlayer: dist(p, st.pos[waiting.p]) < 7 };
+  }
+}
+function onMove(e) {
+  if (!drag || !waiting || waiting.type !== 'move') return;
+  const p = svgPt(e);
+  if (!drag.moved && dist(p, drag.start) > 1.5) drag.moved = true;
+  if (drag.moved && drag.onPlayer) { st.pos[waiting.p] = [clamp(p[0], 2, 98), clamp(p[1], 2, 76)]; render(); }
+}
+async function onUp(e) {
+  if (!drag || !waiting || waiting.type !== 'move') { drag = null; return; }
+  const p = svgPt(e), d = drag; drag = null;
+  const w = waiting;
+  if (d.onPlayer && d.moved) { waiting = null; w.res([clamp(p[0], 2, 98), clamp(p[1], 2, 76)]); return; }
+  if (d.onPlayer && !d.moved) return; // stuknięcie w samego zawodnika: czekamy na wybór miejsca
+  waiting = null;
+  const from = st.pos[w.p].slice(), to = [clamp(p[0], 2, 98), clamp(p[1], 2, 76)];
+  await tween(220, k => { st.pos[w.p] = [from[0] + (to[0] - from[0]) * k, from[1] + (to[1] - from[1]) * k]; render(); });
+  w.res(to);
+}
+
+/* --- podsumowanie --- */
+function finish() {
+  const d = G.drill, idx = DRILLS.indexOf(d), next = DRILLS[idx + 1];
+  const ov = $('#overlay');
+  G.recorded = true;
+  if (G.mode === 'watch') {
+    record({ watched: 1, ms: performance.now() - G.t0 });
+    ov.innerHTML = `<div class="sheet"><h3>Teraz ty</h3><p>Znasz przebieg. Zagraj tę sytuację i sprawdź, czy pamiętasz każdy ruch.</p>
+      <div class="btns"><button class="btn primary" id="o-play">Graj: ${d.name}</button><button class="btn" id="o-again">Pokaż jeszcze raz</button><button class="btn" id="o-menu">Menu</button></div></div>`;
+    ov.hidden = false;
+    $('#o-play').onclick = () => startDrill(d.id, 'play');
+    $('#o-again').onclick = () => startDrill(d.id, 'watch');
+    $('#o-menu').onclick = goHome;
+    return;
+  }
+  const stars = starsFor(G.mistakes);
+  saved[d.id] = Math.max(saved[d.id] || 0, stars); persist();
+  record({ drill: d.id, score: G.score, stars, game: 1, answers: G.answers, correct: G.correct, ms: performance.now() - G.t0 });
+  const title = stars === 3 ? 'Bez błędu!' : stars === 2 ? 'Prawie!' : 'Jeszcze raz';
+  ov.innerHTML = `<div class="sheet">
+      ${starHTML(stars, 'big-stars')}
+      <h3>${title}</h3>
+      <div class="stat"><span><b>${G.score}</b>punkty</span><span><b>${G.steps.length - G.mistakes}/${G.steps.length}</b>trafione</span></div>
+      <div class="btns">
+        ${next ? `<button class="btn primary" id="o-next">Dalej: ${next.name}</button>` : ''}
+        <button class="btn ${next ? '' : 'primary'}" id="o-again">Zagraj jeszcze raz</button>
+        <button class="btn" id="o-menu">Menu</button>
+      </div></div>`;
+  ov.hidden = false;
+  if (next) $('#o-next').onclick = () => startDrill(next.id, 'play');
+  $('#o-again').onclick = () => startDrill(d.id, 'play');
+  $('#o-menu').onclick = goHome;
+}
+
+/* ================= Triggery ================= */
+let T = null, timerRAF = 0;
+const T_TIME = 9000;
+function clearTimer() { cancelAnimationFrame(timerRAF); }
+function startTriggers() {
+  recordUnfinished();
+  epoch++;
+  G = null;
+  T = { order: shuffle(TRIGGERS).slice(0, 10), i: 0, score: 0, streak: 0, ok: 0, answers: 0, t0: performance.now() };
+  show('trig');
+  try { history.replaceState(null, '', '#triggery'); } catch (e) {}
+  nextTrigger();
+}
+function nextTrigger() {
+  clearTimer();
+  if (T.i >= T.order.length) return finishTriggers();
+  const [q, a] = T.order[T.i];
+  const wrong = shuffle(TRIGGERS.filter(x => x[1] !== a)).slice(0, 3).map(x => x[1]);
+  const opts = shuffle([a, ...wrong]);
+  const box = $('#trig');
+  box.innerHTML = `
+    <div class="bar">
+      <button class="icon-btn" id="t-back" aria-label="Wróć do menu">${ICON_BACK}</button>
+      <div class="bar-title"><div class="s">Triggery</div><div class="n">Pytanie ${T.i + 1} z ${T.order.length}</div></div>
+      <div class="score"><b>${T.score}</b><small class="${T.streak >= 2 ? 'hot' : ''}">${T.streak >= 2 ? 'seria ×' + T.streak : 'punkty'}</small></div>
+    </div>
+    <div class="progress"><i style="width:${T.i / T.order.length * 100}%"></i></div>
+    <div class="trig-card"><div class="if">Jeśli…</div><div class="q">${q}</div><div class="timer"><i id="t-bar"></i></div></div>
+    <div class="then">To…</div>
+    <div class="choices" id="t-ch"></div>
+    <div class="fb" id="t-fb" hidden><div class="fb-head" id="t-fbh"></div><p id="t-fbt"></p></div>
+    <button class="next" id="t-next" hidden>Dalej</button>`;
+  $('#t-back').onclick = goHome;
+  const ch = $('#t-ch'); const btns = [];
+  let done = false;
+  const answer = (o, b) => {
+    if (done) return; done = true; clearTimer();
+    const ok = o === a, left = Math.max(0, 1 - (performance.now() - t0) / T_TIME);
+    btns.forEach(x => { x.disabled = true; if (x.textContent === a) x.classList.add('good'); });
+    if (b && !ok) b.classList.add('bad');
+    let gain = 0;
+    T.answers++;
+    if (ok) { T.streak++; T.ok++; gain = 50 + Math.round(left * 50) + Math.min(T.streak - 1, 5) * 10; T.score += gain; }
+    else { T.streak = 0; buzz(120); }
+    const fb = $('#t-fb'); fb.hidden = false; fb.className = 'fb ' + (ok ? 'good' : 'bad');
+    $('#t-fbh').textContent = ok ? `Dobrze! +${gain}` : (b ? 'Nie tym razem' : 'Czas minął');
+    $('#t-fbt').textContent = `${q} → ${a}`;
+    const nb = $('#t-next'); nb.hidden = false; nb.textContent = T.i === T.order.length - 1 ? 'Wynik' : 'Dalej';
+    nb.onclick = () => { T.i++; nextTrigger(); };
+    nb.focus({ preventScroll: true });
+  };
+  opts.forEach(o => { const b = document.createElement('button'); b.className = 'choice'; b.textContent = o; b.onclick = () => answer(o, b); ch.appendChild(b); btns.push(b); });
+  const t0 = performance.now(), bar = $('#t-bar');
+  const tick = now => { const k = Math.min(1, (now - t0) / T_TIME); bar.style.transform = `scaleX(${1 - k})`; if (k >= 1) answer(null, null); else timerRAF = requestAnimationFrame(tick); };
+  timerRAF = requestAnimationFrame(tick);
+}
+function finishTriggers() {
+  const best = saved.__trig || 0, rec = T.score > best;
+  if (rec) { saved.__trig = T.score; persist(); }
+  T.recorded = true;
+  record({ trig: T.score, game: 1, answers: T.answers, correct: T.ok, ms: performance.now() - T.t0 });
+  const ov = $('#overlay');
+  ov.innerHTML = `<div class="sheet">
+    <h3>${rec ? 'Nowy rekord!' : 'Koniec'}</h3>
+    <div class="stat"><span><b>${T.score}</b>punkty</span><span><b>${T.ok}/${T.order.length}</b>trafione</span><span><b>${Math.max(best, T.score)}</b>rekord</span></div>
+    <div class="btns"><button class="btn primary" id="o-again">Jeszcze raz</button><button class="btn" id="o-menu">Menu</button></div></div>`;
+  ov.hidden = false;
+  $('#o-again').onclick = startTriggers;
+  $('#o-menu').onclick = goHome;
+}
+
+/* ================= Konta i ranking drużyny (Supabase) ================= */
+// Przeglądarka czyta tylko widok leaderboard, a zapisuje przez funkcje z supabase.sql.
+const CFG = window.PRINCETON_CONFIG || {};
+const C = { state: 'loading', me: null, players: [], formMode: 'login', busy: false, writing: Promise.resolve() };
+const AUTH_KEY = KEY + '-auth';
+let auth = null;
+try { auth = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch (e) { auth = null; }
+const saveAuth = a => { auth = a; try { a ? localStorage.setItem(AUTH_KEY, JSON.stringify(a)) : localStorage.removeItem(AUTH_KEY); } catch (e) {} };
+let boardTab = 'pts';
+try { boardTab = localStorage.getItem(KEY + '-tab') === 'try' ? 'try' : 'pts'; } catch (e) {}
+const mins = ms => Math.round((ms || 0) / 60000);
+const ERR = {
+  BAD_LOGIN: 'Zła ksywka albo PIN.',
+  LOCKED: 'Za dużo nieudanych prób. Spróbuj za 15 minut.',
+  NICK_TAKEN: 'Ta ksywka jest zajęta. Jeśli jest twoja, wybierz „Mam konto”.',
+  NICK_LEN: 'Ksywka musi mieć od 2 do 24 znaków.',
+  PIN_FORMAT: 'PIN to dokładnie 4 cyfry.',
+  NET: 'Brak połączenia z serwerem wyników. Spróbuj za chwilę.'
+};
+
+const configured = () => /^https:\/\/\S+/.test(CFG.supabaseUrl || '') && (CFG.supabaseKey || '').length > 20 && !/WKLEJ/.test(CFG.supabaseKey);
+const apiBase = () => CFG.supabaseUrl.replace(/\/+$/, '') + '/rest/v1/';
+function headers() {
+  const h = { apikey: CFG.supabaseKey, 'Content-Type': 'application/json' };
+  if (CFG.supabaseKey.startsWith('eyJ')) h.Authorization = 'Bearer ' + CFG.supabaseKey; // starszy klucz "anon"
+  return h;
+}
+async function rpc(fn, body) {
+  const r = await fetch(apiBase() + 'rpc/' + fn, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+function adoptMe(res) {
+  const me = Object.assign({}, res); delete me.token;
+  C.me = me;
+  // gwiazdki z konta widać też na liście sytuacji
+  let changed = false;
+  Object.entries(me.stars || {}).forEach(([k, v]) => { if ((saved[k] || 0) < v) { saved[k] = v; changed = true; } });
+  if ((saved.__trig || 0) < (me.trig || 0)) { saved.__trig = me.trig; changed = true; }
+  if (changed) persist();
+}
+
+async function loadBoard() {
+  if (!configured()) return;
+  try {
+    const r = await fetch(apiBase() + 'leaderboard?select=*&order=total.desc&limit=200', { headers: headers() });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    C.players = await r.json();
+    C.state = 'ready';
+  } catch (e) { if (C.state !== 'ready') C.state = 'offline'; }
+  renderMe(); renderBoard();
+}
+async function initCloud() {
+  if (!configured()) { C.state = 'off'; renderMe(); renderBoard(); return; }
+  if (auth && auth.token) {
+    try {
+      const res = await rpc('get_me', { p_token: auth.token });
+      if (res && res.error) saveAuth(null); else if (res) adoptMe(res);
+    } catch (e) {}
+  }
+  await loadBoard();
+  if (auth && !$('#home').hidden) renderHome();
+  setInterval(() => { if (!document.hidden && !$('#home').hidden) loadBoard(); }, 30000);
+}
+function record(r) {
+  if (!auth || !auth.token || !configured()) return;
+  const p = Object.assign({}, r, { ms: Math.round(r.ms || 0) });
+  C.writing = C.writing
+    .then(() => rpc('record_play', { p_token: auth.token, p }))
+    .then(res => {
+      if (res && res.error === 'BAD_TOKEN') { saveAuth(null); C.me = null; }
+      else if (res && !res.error) adoptMe(res);
+      return loadBoard();
+    })
+    .catch(() => {});
+}
+
+function setTab(t) {
+  boardTab = t;
+  try { localStorage.setItem(KEY + '-tab', t); } catch (e) {}
+  $('#tab-pts').setAttribute('aria-pressed', t === 'pts');
+  $('#tab-try').setAttribute('aria-pressed', t === 'try');
+  renderBoard();
+}
+function avatar(id, nick) {
+  let h = 0; for (const ch of String(id || nick || '?')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const s = document.createElement('span'); s.className = 'av'; s.style.setProperty('--h', h % 360);
+  s.textContent = (nick || '?').trim().charAt(0).toUpperCase() || '?';
+  return s;
+}
+
+function renderMe() {
+  const box = $('#me-box'); if (!box) return;
+  const a = document.activeElement;
+  if (a && box.contains(a) && a.tagName === 'INPUT') return; // nie przerywaj pisania
+  if (C.state === 'off') {
+    box.innerHTML = '<p><b>Ranking nie jest jeszcze podłączony.</b> Gra działa, a wyniki zapisują się na tym telefonie.</p>';
+    return;
+  }
+  if (!auth) { renderAuth(box); return; }
+  const me = C.me || { id: auth.id, nick: auth.nick };
+  const pos = C.players.findIndex(p => p.id === me.id);
+  box.innerHTML = `
+    <div class="me-row"><span id="me-av"></span>
+      <div class="me-name"><span id="me-nick"></span><small>${C.state === 'offline' ? 'Brak połączenia z rankingiem' : 'Zalogowany'} · <button class="linkish" id="me-out">wyloguj</button></small></div></div>
+    <div class="me-stats">
+      <span><b>${pos >= 0 ? '#' + (pos + 1) : '–'}</b>miejsce</span>
+      <span><b>${me.total || 0}</b>punkty</span>
+      <span><b>${me.games || 0}</b>gier</span>
+      <span><b>${mins(me.play_ms)}</b>min gry</span>
+    </div>`;
+  $('#me-av').replaceWith(avatar(me.id, me.nick));
+  $('#me-nick').textContent = me.nick || '';
+  $('#me-out').onclick = () => { saveAuth(null); C.me = null; renderMe(); renderBoard(); };
+}
+function renderAuth(box) {
+  const isNew = C.formMode === 'new';
+  box.innerHTML = `
+    <p><b>Zaloguj się, żeby trafić do rankingu.</b> Wystarczy ksywka i 4-cyfrowy PIN.</p>
+    <div class="tabs" role="group" aria-label="Logowanie">
+      <button type="button" id="au-login" aria-pressed="${!isNew}">Mam konto</button>
+      <button type="button" id="au-new" aria-pressed="${isNew}">Nowe konto</button>
+    </div>
+    <form class="auth" id="au-form" novalidate>
+      <input id="au-nick" maxlength="24" autocomplete="username" placeholder="Ksywka" aria-label="Ksywka">
+      <input id="au-pin" type="password" inputmode="numeric" maxlength="4" autocomplete="${isNew ? 'new-password' : 'current-password'}" placeholder="PIN, 4 cyfry" aria-label="PIN, 4 cyfry">
+      <button class="btn primary" type="submit" id="au-go">${isNew ? 'Załóż konto' : 'Zaloguj'}</button>
+    </form>
+    ${isNew ? '<p>Zapamiętaj PIN. Jeśli go zapomnisz, trener może go zresetować.</p>' : ''}
+    <p class="err" id="au-err" role="alert"></p>`;
+  $('#au-login').onclick = () => { C.formMode = 'login'; renderAuth(box); };
+  $('#au-new').onclick = () => { C.formMode = 'new'; renderAuth(box); };
+  $('#au-form').onsubmit = async e => {
+    e.preventDefault();
+    if (C.busy) return;
+    const nick = $('#au-nick').value.trim(), pin = $('#au-pin').value.trim(), err = $('#au-err');
+    if (nick.length < 2) { err.textContent = ERR.NICK_LEN; return; }
+    if (!/^[0-9]{4}$/.test(pin)) { err.textContent = ERR.PIN_FORMAT; return; }
+    C.busy = true; $('#au-go').disabled = true; err.textContent = '';
+    try {
+      const res = await rpc(isNew ? 'register_player' : 'login_player', { p_nick: nick, p_pin: pin });
+      if (res.error) { err.textContent = ERR[res.error] || ERR.NET; return; }
+      saveAuth({ id: res.id, token: res.token, nick: res.nick });
+      adoptMe(res);
+      document.activeElement && document.activeElement.blur();
+      renderHome();
+      loadBoard();
+    } catch (e2) {
+      err.textContent = ERR.NET;
+    } finally {
+      C.busy = false; const b = $('#au-go'); if (b) b.disabled = false;
+    }
+  };
+}
+
+function renderBoard() {
+  const list = $('#rank'); if (!list) return;
+  if (C.state === 'loading') { list.innerHTML = '<li class="empty">Wczytuję ranking…</li>'; return; }
+  if (C.state === 'off') { list.innerHTML = '<li class="empty">Ranking pojawi się, gdy gra zostanie podłączona do bazy wyników.</li>'; return; }
+  if (C.state === 'offline') { list.innerHTML = '<li class="empty">Nie udało się wczytać rankingu. Sprawdź internet.</li>'; return; }
+  let rows = C.players.map(p => (C.me && p.id === C.me.id) ? Object.assign({}, p, C.me) : p);
+  if (boardTab === 'pts') rows.sort((a, b) => (b.total || 0) - (a.total || 0) || (b.games || 0) - (a.games || 0));
+  else rows.sort((a, b) => (b.games || 0) - (a.games || 0) || (b.answers || 0) - (a.answers || 0) || (b.play_ms || 0) - (a.play_ms || 0));
+  if (!rows.length) { list.innerHTML = '<li class="empty">Nikt jeszcze nie grał. Załóż konto, rozegraj sytuację i zgarnij #1.</li>'; return; }
+  const myId = auth ? auth.id : null;
+  list.innerHTML = '';
+  rows.slice(0, 100).forEach((p, i) => {
+    const li = document.createElement('li');
+    if (p.id === myId) li.className = 'mine';
+    const acc = p.answers ? Math.round((p.correct || 0) / p.answers * 100) : 0;
+    const sub = boardTab === 'pts'
+      ? `${p.stars_sum || 0} piłek · ${acc}% trafień`
+      : `${p.answers || 0} odpowiedzi · ${mins(p.play_ms)} min · ${p.days_count || 0} dni`;
+    const val = boardTab === 'pts' ? `${p.total || 0}<small>pkt</small>` : `${p.games || 0}<small>gier</small>`;
+    li.innerHTML = `<span class="pos">${i + 1}</span><span class="avslot"></span><span class="who"><span class="nm"></span><small></small></span><span class="val">${val}</span>`;
+    $('.avslot', li).replaceWith(avatar(p.id, p.nick));
+    $('.nm', li).textContent = (p.nick || 'Zawodnik') + (p.id === myId ? ' (ty)' : '');
+    $('small', li).textContent = sub;
+    list.appendChild(li);
+  });
+}
+
+/* ================= Start ================= */
+renderHome();
+initCloud();
+const h = (location.hash || '').slice(1);
+if (h === 'triggery') startTriggers();
+else if (DRILLS.some(d => d.id === h)) startDrill(h, 'play');
+else show('home');
+})();
+</script>
+</body>
+</html>
