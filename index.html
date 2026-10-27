@@ -1149,7 +1149,7 @@ function renderAuth(box) {
       <input id="au-pin" type="password" inputmode="numeric" maxlength="4" autocomplete="${isNew ? 'new-password' : 'current-password'}" placeholder="PIN, 4 cyfry" aria-label="PIN, 4 cyfry">
       <button class="btn primary" type="submit" id="au-go">${isNew ? 'Załóż konto' : 'Zaloguj'}</button>
     </form>
-    ${isNew ? '<p>Zapamiętaj PIN. Jeśli go zapomnisz, trener może go zresetować.</p>' : ''}
+    ${isNew ? '<p>Zapamiętaj PIN. Jeśli go zapomnisz, napisz do Bartka, zresetuje go.</p>' : ''}
     <p class="err" id="au-err" role="alert"></p>`;
   $('#au-login').onclick = () => { C.formMode = 'login'; renderAuth(box); };
   $('#au-new').onclick = () => { C.formMode = 'new'; renderAuth(box); };
