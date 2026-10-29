@@ -292,6 +292,8 @@ const BENCH = { pos: { 1: [18, 72], 2: [34, 72], 3: [50, 72], 4: [66, 72], 5: [8
 const mv = (p, to, via) => ({ k: 'move', p, to, via });
 const cut = (p, to, via) => ({ k: 'cut', p, to, via });
 const drb = (p, to, via) => ({ k: 'dribble', p, to, via });
+// kozioł w kilku odcinkach, np. najpierw obok zasłony, potem do kosza: legs = [[cel, przez], ...]
+const drive = (p, legs) => ({ k: 'dribble', p, legs, to: legs[legs.length - 1][0] });
 const scr = (p, to, via) => ({ k: 'screen', p, to, via });
 const pas = (from, to) => ({ k: 'pass', from, to });
 const dho = (from, to) => ({ k: 'dho', from, to });
@@ -342,7 +344,7 @@ const LP_BC = [
 const LP_DHO = [
   LP_NOPASS,
   { h: 'Krok 3 · Hand-off', def: { p: 4, kind: 'loose', label: 'Obrońca 4: luźno' }, q: Qch('Obrońca 4 kryje luźno. Co robi 4?', ['Bierze hand-off (DHO) od 3', 'Back cut do kosza', 'Zostaje na topie']), a: [[mv(4, [62, 54])], [dho(3, 4)]], t: 'Kryją cię luźno, więc bierzesz piłkę. 4 bierze hand-off od 3.' },
-  { h: 'Krok 3 · Hand-off', q: Qwho(5, 'Kto stawia screen dla 4 po hand-offie?'), a: [[scr(5, [54, 51]), mv(3, 'RW')], [drb(4, 'RIM', [76, 30])], [shot(4)]], t: '5 wychodzi na topa i stawia screen dla 4. 3 robi miejsce na skrzydle, a 4 atakuje kosz w stronę 3, po prawej.' }
+  { h: 'Krok 3 · Hand-off', q: Qwho(5, 'Kto stawia screen dla 4 po hand-offie?'), a: [[scr(5, [68, 42], [70, 32]), mv(3, 'RW')], [drive(4, [[[76, 46], [69, 51]], ['RIM', [75, 28]]])], [shot(4)]], t: '5 wychodzi prawą stroną i stawia screen po prawej stronie 4, a 3 robi miejsce na skrzydle. 4 najpierw mija zasłonę, potem atakuje kosz prawą stroną.' }
 ];
 
 const P_START = [
@@ -359,7 +361,7 @@ const P_AWAY_A = [
   { h: 'Away · wersja a', def: { p: 2, kind: 'tight', label: 'Obrońca 2: ciasno' }, q: Qmove(2, 'RIM', 'Obrońca 2 kryje ciasno. Gdzie biegnie 2?'), a: [cut(2, 'RIM', [26, 20]), mv(4, 'LS')], t: '2 robi cut do kosza po podanie od 5, a 4 robi pop na obwód. Przeciwne ruchy przy screenie.' },
   { h: 'Away · wersja a', q: Qpass(4, '2 nie dostał piłki. Gdzie podaje 5?'), a: [pas(5, 4)], t: '5 oddaje do 4, który zrobił pop na obwód.' },
   { h: 'Away · wersja a', q: Qwho(5, 'Kto stawia 4 on-ball screen?'), a: [scr(5, [38, 50])], t: '5 stawia on-ball screen dla 4.' },
-  { h: 'Away · wersja a', q: Qwho(3, 'Kto stawia down screen dla 2?'), a: [[scr(3, [78, 20])], [cut(2, [86, 27], [72, 8]), drb(4, [42, 28], [46, 46])]], t: '3 stawia down screen, 2 wychodzi na midrange albo trójkę. 4 ma dużo miejsca do ataku i shootera obok.' }
+  { h: 'Away · wersja a', q: Qwho(3, 'Kto stawia down screen dla 2?'), a: [[scr(3, [78, 20])], [cut(2, [86, 27], [72, 8]), drive(4, [[[46, 55], [38, 59]], [[44, 27], [48, 40]]])]], t: '3 stawia down screen, 2 wychodzi na midrange albo trójkę. 4 mija zasłonę 5 i ma dużo miejsca do ataku, a obok shootera.' }
 ];
 const P_AWAY_B = [
   P_CHOOSE, AWAY,
@@ -402,13 +404,13 @@ const C_POP = [
 const C_POP_COVERED = [
   FLARE, FLARE_POP,
   { h: 'Krok 3a · Kryty', def: { p: 2, kind: 'tight', label: 'Obrońca 2: dobiegł' }, q: Qch('2 łapie piłkę, ale obrońca dobiegł. Co robi?', ['Czeka na drugi screen od 5 i atakuje', 'Rzuca mimo wszystko', 'Oddaje do 4']), t: 'Obrońca dobiegł, więc czekasz na drugi screen od 5 i atakujesz kosz.' },
-  { h: 'Krok 3a · Kryty', q: Qwho(5, 'Kto stawia on-ball screen dla 2?'), a: [[scr(5, [57, 54])], [drb(2, 'RIM', [57, 38]), mv(1, 'RC')], [shot(2)]], t: '5 stawia on-ball screen i 2 atakuje. Shooterzy czekają w obu cornerach.' }
+  { h: 'Krok 3a · Kryty', q: Qwho(5, 'Kto stawia on-ball screen dla 2?'), a: [[scr(5, [57, 54]), mv(1, 'RC')], [drive(2, [[[42, 58], [54, 62]], ['RIM', [37, 38]]])], [shot(2)]], t: '5 stawia on-ball screen. 2 najpierw schodzi kozłem tuż obok zasłony i dopiero za nią skręca do kosza. Shooterzy czekają w obu cornerach.' }
 ];
 const C_CURL = [
   FLARE,
   { h: 'Krok 3b · Flare: curl', def: { p: 2, kind: 'tight', label: 'Obrońca 2: goni za screenem' }, q: Qmove(2, 'RIM', 'Obrońca goni 2 nad screenem. Gdzie robi curl?'), a: [cut(2, 'RIM', [50, 44])], t: '2 robi curl wokół screena do kosza po podanie od 4.' },
   { h: 'Krok 3b · Flare: curl', q: Qmove(2, 'RC', '2 nie dostał piłki. Gdzie schodzi?'), a: [cut(2, 'RC', [72, 5])], t: 'Bez podania 2 schodzi do corner na weak side.' },
-  { h: 'Krok 3b · Flare: curl', q: Qwho(5, 'Kto stawia on-ball screen dla 4?'), a: [[scr(5, [19, 42])], [drb(4, [46, 26], [30, 46])]], t: '5 biegnie postawić on-ball screen dla 4, a 4 atakuje.' },
+  { h: 'Krok 3b · Flare: curl', q: Qwho(5, 'Kto stawia on-ball screen dla 4?'), a: [[scr(5, [19, 42])], [drive(4, [[[26, 51], [15, 49]], [[46, 26], [38, 38]]])]], t: '5 biegnie postawić on-ball screen dla 4. 4 najpierw mija zasłonę, potem atakuje środkiem.' },
   { h: 'Krok 3b · Flare: curl', q: Qch('Lay-upu nie ma. Gdzie 4 szuka podania?', ['Do shooterów na weak side', 'Wraca z piłką na topa', 'Do 5 przy linii końcowej']), a: [[pas(4, 2)], [shot(2)]], t: 'Na weak side czekają dwaj shooterzy: 1 na skrzydle i 2 w rogu.' }
 ];
 
@@ -487,6 +489,7 @@ const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (
 const ctrl = (a, b, via) => via ? [2 * via[0] - (a[0] + b[0]) / 2, 2 * via[1] - (a[1] + b[1]) / 2] : [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
 const qb = (a, c, b, t) => { const u = 1 - t; return [u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]]; };
 const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const easeIn = t => t * t, easeOut = t => 1 - (1 - t) * (1 - t);
 const starsFor = m => m === 0 ? 3 : m === 1 ? 2 : 1;
 const starHTML = (n, cls = 'stars') => `<span class="${cls}">${[0, 1, 2].map(i => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span>`;
 const ICON_BACK = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
@@ -628,7 +631,7 @@ function ageTrails() {
   [...gTrails.children].forEach(c => { if (c.classList.contains('old')) c.remove(); else c.classList.add('old'); });
   gMarks.innerHTML = '';
 }
-function drawTrail(kind, a, c, b) {
+function drawTrail(kind, a, c, b, cont) {
   const g = el('g', {}, gTrails);
   const d = `M${a[0]} ${a[1]} Q${c[0]} ${c[1]} ${b[0]} ${b[1]}`;
   if (kind === 'screen') {
@@ -638,20 +641,23 @@ function drawTrail(kind, a, c, b) {
     el('line', { class: 'tr bar', x1: ex - nx, y1: ey - ny, x2: ex + nx, y2: ey + ny }, g);
     // nie zasłaniaj zawodnika końcówką linii
   } else {
-    const shorten = (kind === 'pass' || kind === 'dho') ? 4.2 : 3.8;
+    // cont: ruch trwa dalej kolejnym odcinkiem, więc linia dochodzi do końca i nie ma grotu
+    const shorten = cont ? 0 : (kind === 'pass' || kind === 'dho') ? 4.2 : 3.8;
     const L = dist(a, b);
     if (L < 4) return;
     const tEnd = 1 - shorten / Math.max(L, 1), tStart = (kind === 'pass' || kind === 'dho') ? 3.4 / L : 0;
     const p0 = qb(a, c, b, tStart), p1 = qb(a, c, b, tEnd);
     const cc = qb(a, c, b, (tStart + tEnd) / 2);
     const c2 = [2 * cc[0] - (p0[0] + p1[0]) / 2, 2 * cc[1] - (p0[1] + p1[1]) / 2];
-    el('path', { class: 'tr ' + (kind === 'dho' ? 'pass' : kind), d: `M${p0[0]} ${p0[1]} Q${c2[0]} ${c2[1]} ${p1[0]} ${p1[1]}`, 'marker-end': `url(#${kind === 'pass' || kind === 'dho' || kind === 'screen' ? 'arr-i' : 'arr-a'})` }, g);
+    const attrs = { class: 'tr ' + (kind === 'dho' ? 'pass' : kind), d: `M${p0[0]} ${p0[1]} Q${c2[0]} ${c2[1]} ${p1[0]} ${p1[1]}` };
+    if (!cont) attrs['marker-end'] = `url(#${kind === 'pass' || kind === 'dho' || kind === 'screen' ? 'arr-i' : 'arr-a'})`;
+    el('path', attrs, g);
   }
 }
 
 /* ================= Animacje ================= */
 let epoch = 0;
-function tween(dur, fn) {
+function tween(dur, fn, ez = ease) {
   const my = epoch;
   if (reduced) dur = Math.min(dur, 60);
   return new Promise(res => {
@@ -659,7 +665,7 @@ function tween(dur, fn) {
     const f = now => {
       if (my !== epoch) return res();
       const k = Math.min(1, (now - t0) / dur);
-      fn(ease(k));
+      fn(ez(k));
       if (k < 1) requestAnimationFrame(f); else res();
     };
     requestAnimationFrame(f);
@@ -670,11 +676,18 @@ async function act(a, sp) {
   const my = epoch;
   if (a.k === 'ball') { st.ball = a.p; render(); return; }
   if (['move', 'cut', 'dribble', 'screen'].includes(a.k)) {
-    const from = st.pos[a.p].slice(), to = pt(a.to), c = ctrl(from, to, a.via);
-    drawTrail(a.k, from, c, to);
-    const dur = clamp(dist(from, to) * 17, 320, 1150) / sp;
-    await tween(dur, k => { st.pos[a.p] = qb(from, c, to, k); render(); });
-    if (my === epoch) { st.pos[a.p] = to; render(); }
+    // odcinki łączą się bez zatrzymania: przyspieszenie na pierwszym, hamowanie na ostatnim
+    const legs = a.legs || [[a.to, a.via]];
+    for (let i = 0; i < legs.length; i++) {
+      const from = st.pos[a.p].slice(), to = pt(legs[i][0]), c = ctrl(from, to, legs[i][1]);
+      const first = i === 0, last = i === legs.length - 1;
+      drawTrail(a.k, from, c, to, !last);
+      const ez = legs.length === 1 ? ease : first ? easeIn : last ? easeOut : (t => t);
+      const dur = clamp(dist(from, to) * 17, legs.length === 1 ? 320 : 160, 1150) / sp;
+      await tween(dur, k => { st.pos[a.p] = qb(from, c, to, k); render(); }, ez);
+      if (my !== epoch) return;
+      st.pos[a.p] = to; render();
+    }
     return;
   }
   if (a.k === 'pass' || a.k === 'dho') {
