@@ -335,12 +335,14 @@ const LP_NOPASS = { h: 'Krok 3 · Nie ma podania do 5', q: Qch('5 jest dobrze kr
 const LP_BC = [
   LP_NOPASS,
   { h: 'Krok 3 · Back cut', def: { p: 4, kind: 'tight', label: 'Obrońca 4: ciasno, odcina hand-off' }, q: Qmove(4, 'RIM', 'Obrońca 4 kryje ciasno. Gdzie idzie 4?'), a: [cut(4, 'RIM', [42, 34])], t: 'Kryją cię ciasno, więc back cut: idziesz do kosza za plecami obrońcy.' },
-  { h: 'Krok 3 · Back cut', q: Qch('Jak 3 podaje do 4 na back cut?', ['Bounce pass', 'Lob nad obrońcą', 'Nie podaje, rzuca sam']), a: [[pas(3, 4)], [shot(4)]], t: 'Bounce pass od 3 i lay-up. Bez podania 4 wraca na skrzydło.' }
+  { h: 'Krok 3 · Back cut', q: Qch('Jak 3 podaje do 4 na back cut?', ['Bounce pass', 'Lob nad obrońcą', 'Nie podaje, rzuca sam']), t: 'Przy back cucie 3 podaje bounce pass. Jeśli 4 jest wolny, kończy lay-upem.' },
+  { h: 'Krok 3 · Bez podania', q: Qmove(4, 'RC', 'Obrona pomogła i podania nie ma. Gdzie ścina 4?'), a: [cut(4, 'RC', [74, 8])], t: 'Nie dostałeś piłki, więc wychodzisz. 4 ścina spod kosza do wolnego rogu po stronie piłki.' },
+  { h: 'Krok 3 · Bez podania', q: Qpass(4, '4 jest wolny w rogu. Gdzie podaje 3?'), a: [[pas(3, 4)], [shot(4)]], t: 'Podanie do rogu i open three.' }
 ];
 const LP_DHO = [
   LP_NOPASS,
   { h: 'Krok 3 · Hand-off', def: { p: 4, kind: 'loose', label: 'Obrońca 4: luźno' }, q: Qch('Obrońca 4 kryje luźno. Co robi 4?', ['Bierze hand-off (DHO) od 3', 'Back cut do kosza', 'Zostaje na topie']), a: [[mv(4, [62, 54])], [dho(3, 4)]], t: 'Kryją cię luźno, więc bierzesz piłkę. 4 bierze hand-off od 3.' },
-  { h: 'Krok 3 · Hand-off', q: Qwho(5, 'Kto stawia screen dla 4 po hand-offie?'), a: [[scr(5, [55, 45])], [drb(4, 'RIM', [46, 36])], [shot(4)]], t: '5 wychodzi na topa i stawia screen dla 4. 4 atakuje kosz.' }
+  { h: 'Krok 3 · Hand-off', q: Qwho(5, 'Kto stawia screen dla 4 po hand-offie?'), a: [[scr(5, [54, 51]), mv(3, 'RW')], [drb(4, 'RIM', [76, 30])], [shot(4)]], t: '5 wychodzi na topa i stawia screen dla 4. 3 robi miejsce na skrzydle, a 4 atakuje kosz w stronę 3, po prawej.' }
 ];
 
 const P_START = [
@@ -391,7 +393,7 @@ const C_START = [
   { h: 'Krok 2 · Shuffle cut', q: Qmove(3, 'RIM', 'Shuffle cut! Gdzie biegnie 3?'), a: [cut(3, 'RIM', [62, 30])], t: '3 robi shuffle cut do kosza po podanie od 4. To często wolny lay-up.' },
   { h: 'Krok 2 · Shuffle cut', q: Qmove(3, 'LC', '3 nie dostał podania. Gdzie schodzi?'), a: [cut(3, 'LC', [28, 4])], t: 'Bez podania 3 schodzi do corner po ball side. Piłka jest u 4 na lewym skrzydle, więc lewy róg.' }
 ];
-const FLARE = { h: 'Flare', q: Qwho(5, 'Po shuffle cucie 5 stawia flare screen. Dla kogo?'), a: [scr(5, [42, 52])], t: '5 stawia flare screen dla 2. 2 czyta obrońcę: pop i rzut albo curl do kosza.' };
+const FLARE = { h: 'Flare', q: Qwho(2,'Po shuffle cucie 5 stawia flare screen. Dla kogo?'), a: [scr(5, [42, 52])], t: '5 stawia flare screen dla 2. 2 czyta obrońcę: pop i rzut albo curl do kosza.' };
 const FLARE_POP = { h: 'Krok 3a · Flare: pop', q: Qmove(2, [64, 59], '2 robi pop po flare screenie. W którą stronę?', 13), a: [[cut(2, [64, 59], [46, 66])], [pas(4, 2)]], t: '2 odchodzi od piłki za screenem 5, a 4 podaje do 2.' };
 const C_POP = [
   FLARE, FLARE_POP,
@@ -823,14 +825,14 @@ async function playStep(s) {
     const ghost = el('circle', { class: 'ghost', cx: orig[0], cy: orig[1], r: 3.5 }, gMarks);
     const drop = await new Promise(res => { waiting = { type: 'move', p: q.p, res }; });
     if (my !== epoch) return;
-    const target = pt(q.to), tol = q.tol || 11;
+    const target = pt(q.to), tol = (q.tol || 11) * 1.4; // szeroki margines: liczy się kierunek, nie punkt
     correct = dist(drop, target) <= tol;
     ghost.remove();
     if (correct) el('circle', { class: 'drop-good', cx: drop[0], cy: drop[1], r: 2.2 }, gMarks);
     else {
       el('line', { class: 'drop-bad', x1: drop[0] - 1.8, y1: drop[1] - 1.8, x2: drop[0] + 1.8, y2: drop[1] + 1.8 }, gMarks);
       el('line', { class: 'drop-bad', x1: drop[0] - 1.8, y1: drop[1] + 1.8, x2: drop[0] + 1.8, y2: drop[1] - 1.8 }, gMarks);
-      el('circle', { class: 'target', cx: target[0], cy: target[1], r: tol * .55 }, gMarks);
+      el('circle', { class: 'target', cx: target[0], cy: target[1], r: tol * .7 }, gMarks);
       answerNote = 'Zielone pole to właściwe miejsce. ';
     }
     st.pos[q.p] = orig; setPlayerClass(q.p, ''); render();
@@ -880,7 +882,7 @@ async function playStep(s) {
 /* --- dotyk na boisku --- */
 let drag = null;
 function nearestPlayer(p, exclude) {
-  let best = null, bd = 7.5;
+  let best = null, bd = 9;
   for (let i = 1; i <= 5; i++) { if (i === exclude) continue; const d = dist(p, st.pos[i]); if (d < bd) { bd = d; best = i; } }
   return best;
 }
